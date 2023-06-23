@@ -1,0 +1,21 @@
+{
+  "name": "treeditor",
+  "version": "1.0.0",
+  "description": "",
+  "default": "index.html",
+  "scripts": {
+    "dev": "parcel index.html --port 8000",
+    "build": "rm -rf ./dist && parcel build index.html --dist-dir ./dist && cp -r ./resources ./dist/"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.3.4",
+    "three": "^0.152.2",
+    "three-mesh-bvh": "^0.5.23"
+  },
+  "devDependencies": {
+    "buffer": "^5.7.1",
+    "parcel": "latest"
+  }
+}
