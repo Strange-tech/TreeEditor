@@ -76,7 +76,7 @@ async function main() {
   };
 
   const customizeTree = new CustomizeTree();
-  let treeObj = customizeTree.getTree("木芙蓉");
+  let treeObj = customizeTree.getTree("普通乔木");
 
   builder.init(treeObj, true, "y-axis");
   let skeleton = builder.buildSkeleton();

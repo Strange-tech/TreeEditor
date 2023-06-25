@@ -26,22 +26,22 @@ class CustomizeTree {
         path: "resources/images/fgwt/",
         depth: 2,
         disturb: 0.01,
-        gravity: 0,
-        shrink: { single: 0.3, multi: 0.4, root: true },
+        gravity: 10,
+        shrink: { single: 0.3, multi: 0.3, root: true },
         tubular_segments: 10,
         radial_segments: 6,
         sample_offset: 0.005,
         leaf: {
           geometry: { style: "cross", width: 1, height: 1 },
           scale: 2,
-          alphaTest: 0.9,
+          alphaTest: 0.5,
         },
         branches: [
           // root node
           {
             start: new THREE.Vector3(0, 0, 0),
             end: new THREE.Vector3(0, 10, 0),
-            radius: 0.4,
+            radius: 0.3,
             fork: [
               // [ fork_position, noise1, fork_angle, noise2, next_level_length, noise3, number ]
               [0.4, 0.05, Math.PI / 2.5, Math.PI / 36, 4, 0.5, 5],
@@ -62,7 +62,7 @@ class CustomizeTree {
           {
             leaves: [
               // [ leaves_position, noise1, leaves_angle, noise2, number]
-              [0.6, 0.4, Math.PI / 3, 0, 3],
+              [0.6, 0.4, Math.PI / 5, 0, 3],
             ],
           },
         ],
@@ -76,26 +76,26 @@ class CustomizeTree {
         shrink: { single: 0.4, multi: 0.5, root: true },
         tubular_segments: 5,
         radial_segments: 6,
-        sample_offset: 0,
+        sample_offset: 0.01,
         leaf: {
           geometry: { style: "cross", width: 1, height: 1 },
-          scale: 1,
+          scale: 0.8,
           alphaTest: 0.5,
         },
         branches: [
           // root node
           {
             start: new THREE.Vector3(0, 0, 0),
-            end: new THREE.Vector3(0, 12, 0),
-            radius: 0.45,
-            fork: [[0.6, 0.3, Math.PI / 5, Math.PI / 36, 5, 0.5, 10]],
+            end: new THREE.Vector3(0, 8, 0),
+            radius: 0.3,
+            fork: [[0.6, 0.3, Math.PI / 5, Math.PI / 36, 4, 0.5, 5]],
           },
           // middle node
           {
-            fork: [[0.5, 0.4, Math.PI / 6, 0, 4, 0.5, 5]],
+            fork: [[0.5, 0.4, Math.PI / 6, 0, 3, 0.5, 5]],
           },
           {
-            fork: [[0.5, 0.4, Math.PI / 6, 0, 3, 0.5, 2]],
+            fork: [[0.5, 0.4, Math.PI / 6, 0, 2, 0.5, 2]],
           },
           {
             fork: [[0.5, 0.4, Math.PI / 6, 0, 1, 0.5, 3]],
@@ -110,22 +110,22 @@ class CustomizeTree {
         name: "国槐",
         path: "resources/images/guohuai/",
         depth: 5,
-        disturb: 0.04,
+        disturb: 0.02,
         gravity: 2,
-        shrink: { single: 0.4, multi: 0.5, root: true },
+        shrink: { single: 0.4, multi: 0.4, root: true },
         tubular_segments: 5,
         radial_segments: 6,
         sample_offset: 0.01,
         leaf: {
           geometry: { style: "cross", width: 0.5, height: 1, foldDegree: 0.3 },
-          scale: 0.7,
+          scale: 0.6,
           alphaTest: 0.5,
         },
         branches: [
           // root node
           {
             start: new THREE.Vector3(0, 0, 0),
-            end: new THREE.Vector3(0, 8, 0),
+            end: new THREE.Vector3(0, 10, 0),
             radius: 0.5,
             fork: [
               [0.5, 0.1, Math.PI / 4, Math.PI / 36, 4, 0.5, 3],
@@ -144,11 +144,11 @@ class CustomizeTree {
             fork: [[0.6, 0.3, Math.PI / 5, Math.PI / 36, 1, 0.5, 3]],
           },
           {
-            fork: [[0.6, 0.3, Math.PI / 5, Math.PI / 36, 0.5, 0.2, 3]],
+            fork: [[0.5, 0.4, Math.PI / 5, Math.PI / 36, 0.5, 0.2, 3]],
           },
           // leaf node
           {
-            leaves: [[0.8, 0.2, Math.PI / 6, 0, 5]],
+            leaves: [[0.5, 0.4, Math.PI / 6, 0, 5]],
           },
         ],
       },
