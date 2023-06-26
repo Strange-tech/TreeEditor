@@ -1,8 +1,10 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
 import { TreeBuilder } from "../TreeBuilder";
 import { CustomizeTree } from "../CustomizeTree";
+import { randomRangeLinear } from "../utilities";
 
 const main = () => {
   const canvas = document.querySelector("#c");
@@ -18,7 +20,7 @@ const main = () => {
   const near = 0.1;
   const far = 5000;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  camera.position.set(500, 500, 500);
+  camera.position.set(50, 50, 50);
   camera.lookAt(0, 10, 0);
 
   {
@@ -35,15 +37,15 @@ const main = () => {
   controls.target.set(0, 10, 0);
   controls.update();
 
-  const size = 1000;
-  const segment = 100;
+  const size = 2000;
+  const segment = 400;
   const unit = size / segment;
   const circle_radius = 5;
 
   scene.add(new THREE.AxesHelper(size));
 
-  const gridHelper = new THREE.GridHelper(size, segment);
-  scene.add(gridHelper);
+  // const gridHelper = new THREE.GridHelper(size, segment);
+  // scene.add(gridHelper);
 
   const geometry = new THREE.PlaneGeometry(size, size);
   geometry.rotateX(-Math.PI / 2);
@@ -54,6 +56,12 @@ const main = () => {
   );
   scene.add(plane);
 
+  const loader = new GLTFLoader();
+  loader.load("resources/upload/model3.glb", (glb) => {
+    // console.log(glb.scene);
+    scene.add(glb.scene);
+  });
+
   /* 系统全局变量 */
   const customizeTree = new CustomizeTree();
   let treeObj = customizeTree.getTree("普通乔木"); // default species
@@ -63,8 +71,8 @@ const main = () => {
   let pointer = new THREE.Vector2();
   let points = [];
   let cells = [];
-  let timer, interval_timer, isDaubing;
-  const cellgeo = new THREE.SphereGeometry(unit);
+  let timer, interval_timer;
+  const cellgeo = new THREE.SphereGeometry(unit / 2);
   const cellmat = new THREE.MeshBasicMaterial({
     color: "red",
     transparent: true,
@@ -82,18 +90,208 @@ const main = () => {
   const curvegeo = new THREE.BufferGeometry();
   const curvemat = new THREE.LineBasicMaterial({ color: "brown" });
   const curvemesh = new THREE.Line(curvegeo, curvemat);
+  const line_group = new THREE.Group();
+  const linemat = new THREE.LineBasicMaterial({ color: "brown" });
 
   const assistance_group = new THREE.Group(); // 存储辅助模型
   const treegroup = new THREE.Group(); // 存储当前场景的模型
+  const tree_species = [
+    "Ordinary tree",
+    "Chinese huai",
+    "Gui flower",
+    "Mu furong",
+    "Sweet zhang",
+  ];
   let current_mode = "view"; // ["view", "edit"]
   let current_edit_way = "place_a_tree"; // ["place_a_tree", "draw_a_line", "spread_an_area", "delineate_an_area"]
   let place_statement = "placing"; // ["placing", "placed"]
-  let current_tree = "ordinary_tree";
+  let current_tree = "Ordinary tree";
+
+  const base_height = 5.5;
 
   scene.add(assistance_group);
   scene.add(treegroup);
 
+  /* GUI */
+  const guiobj = {
+    "sample number": 0,
+    "is closed": false,
+    "total number": 0,
+    size: 1,
+    "size volatility": 0,
+    "random orientation": true,
+    "mesh instanced": true,
+    "place a tree": function () {
+      assistance_group.add(cellmesh);
+      switch_mode_to_edit_("place_a_tree");
+    },
+    "draw a line": function () {
+      assistance_group.add(cellmesh);
+      assistance_group.add(curvemesh);
+      switch_mode_to_edit_("draw_a_line");
+    },
+    "spread an area": function () {},
+    "delineate an area": function () {
+      assistance_group.add(cellmesh);
+      assistance_group.add(line_group);
+      switch_mode_to_edit_("delineate_an_area");
+    },
+    view: function () {
+      switch_mode_to_view();
+    },
+    "delete all": function () {
+      scene.remove(treegroup);
+      scene.remove(pointgroup);
+    },
+    "Ordinary tree": function () {
+      activate_tree("Ordinary tree");
+      treeObj = new CustomizeTree().getTree("普通乔木");
+      builder.init(treeObj, true);
+    },
+    "Chinese huai": function () {
+      activate_tree("Chinese huai");
+      treeObj = new CustomizeTree().getTree("国槐");
+      builder.init(treeObj, true);
+    },
+    "Gui flower": function () {
+      activate_tree("Gui flower");
+      treeObj = new CustomizeTree().getTree("桂花");
+      builder.init(treeObj, true);
+    },
+    "Mu furong": function () {
+      activate_tree("Mu furong");
+      treeObj = new CustomizeTree().getTree("木芙蓉");
+      builder.init(treeObj, true);
+    },
+    "Sweet zhang": function () {
+      activate_tree("Sweet zhang");
+      treeObj = new CustomizeTree().getTree("香樟");
+      builder.init(treeObj, true);
+    },
+    generate: function () {
+      let tree = builder.buildTree(builder.buildSkeleton());
+      let volatility = this["size volatility"] * this["size"];
+      let random_matrices = [];
+      if (current_mode === "edit") {
+        if (current_edit_way === "place_a_tree") {
+          tree.scale
+            .setScalar(this["size"])
+            .addScalar(randomRangeLinear(-volatility, volatility));
+          tree.rotateY(
+            this["random orientation"] ? Math.random() * 2 * Math.PI : 0
+          );
+          tree.position.copy(cellmesh.position);
+          treegroup.add(tree);
+        } else if (current_edit_way === "draw_a_line") {
+          curve.closed = this["is closed"];
+          let sample_points = curve.getPoints(this["sample number"] - 1);
+          if (this["mesh instanced"]) {
+            sample_points.forEach((p) => {
+              random_matrices.push(
+                new THREE.Matrix4().makeTranslation(p.x, p.y, p.z)
+              );
+            });
+            treegroup.add(buildInstancedMeshGroup(tree, random_matrices));
+          } else {
+            sample_points.forEach((p) => {
+              let eachtree = tree.clone();
+              eachtree.position.copy(p);
+              treegroup.add(eachtree);
+            });
+          }
+        } else if (current_edit_way === "delineate_an_area") {
+          let vector2s = [];
+          let triangles = [];
+          points.forEach((point, index) => {
+            vector2s.push(new THREE.Vector2(point.x, point.z));
+            if (index >= 2) {
+              triangles.push(
+                new THREE.Triangle(point, points[index - 1], points[0])
+              );
+            }
+          });
+          let box2 = new THREE.Box2().setFromPoints(vector2s);
+          let cnt = 0;
+          while (cnt < this["total number"]) {
+            let random_point = new THREE.Vector3(
+              randomRangeLinear(box2.min.x, box2.max.x),
+              base_height,
+              randomRangeLinear(box2.min.y, box2.max.y)
+            );
+            if (is_in_polygon(random_point, triangles)) {
+              random_matrices.push(
+                new THREE.Matrix4().makeTranslation(
+                  random_point.x,
+                  random_point.y,
+                  random_point.z
+                )
+              );
+              cnt++;
+            }
+          }
+          treegroup.add(buildInstancedMeshGroup(tree, random_matrices));
+        }
+      }
+      terminate_edit_mode();
+      builder.clearMesh();
+    },
+  };
+  const gui = new GUI();
+
+  const mode_folder = gui.addFolder("MODE");
+  mode_folder.add(guiobj, "view");
+  mode_folder.add(guiobj, "delete all");
+
+  const tree_folder = gui.addFolder("TREE");
+  const tree_folder_controller = [];
+  tree_species.forEach((tree) => {
+    tree_folder_controller.push(tree_folder.add(guiobj, tree));
+  });
+
+  const generate_folder = gui.addFolder("GENERATOR");
+  generate_folder.add(guiobj, "size", 0, 5, 0.1);
+  generate_folder.add(guiobj, "size volatility", 0, 1, 0.1);
+  generate_folder.add(guiobj, "random orientation", true);
+  const mesh_instanced_block = generate_folder.add(
+    guiobj,
+    "mesh instanced",
+    true
+  );
+  const generate_block = generate_folder.add(guiobj, "generate").disable();
+
+  const edit_folder = mode_folder.addFolder("edit");
+  edit_folder.add(guiobj, "place a tree");
+  const draw_line_folder = edit_folder.addFolder("draw a line");
+  draw_line_folder.add(guiobj, "draw a line");
+  draw_line_folder.add(guiobj, "sample number", 2, 100, 1).onChange((v) => {
+    if (current_mode === "edit" && current_edit_way === "draw_a_line" && v > 0)
+      generate_block.enable();
+    else generate_block.disable();
+  });
+
+  draw_line_folder.add(guiobj, "is closed");
+  const delineate_area_folder = edit_folder.addFolder("delineate an area");
+  delineate_area_folder.add(guiobj, "delineate an area");
+  delineate_area_folder.add(guiobj, "total number", 1, 100, 1).onChange((v) => {
+    if (
+      current_mode === "edit" &&
+      current_edit_way === "delineate_an_area" &&
+      v > 0
+    )
+      generate_block.enable();
+    else generate_block.disable();
+  });
+
   /* 系统函数 */
+  const activate_tree = function (species) {
+    tree_species.forEach((v, i) => {
+      if (v === species)
+        tree_folder_controller[i].domElement.classList.add("control-active");
+      else
+        tree_folder_controller[i].domElement.classList.remove("control-active");
+    });
+  };
+
   const buildInstancedMeshGroup = function (singleTree, matrices) {
     const instancedMeshGroup = new THREE.Group();
     const instancedMeshes = [];
@@ -119,18 +317,19 @@ const main = () => {
     );
     raycaster.setFromCamera(pointer, camera);
     const intersects = raycaster.intersectObject(object, false);
-    if (intersects.length > 0) return intersects[0].point.setY(0);
+    if (intersects.length > 0) return intersects[0].point.setY(base_height);
     return;
   };
 
   const onMouseMove = (event) => {
     // console on screen
-    console.log("mouse move");
+    // console.log("mouse move");
     if (current_mode === "edit") {
       if (
         (current_edit_way === "place_a_tree" &&
           place_statement === "placing") ||
-        current_edit_way === "draw_a_line"
+        current_edit_way === "draw_a_line" ||
+        current_edit_way === "delineate_an_area"
       ) {
         // update UI
         move_the_ball(event);
@@ -143,21 +342,47 @@ const main = () => {
     function move_the_ball(event) {
       let point = intersecting(event, plane);
       cellmesh.material.opacity = 0.5;
-      if (point) cellmesh.position.set(point.x, 0, point.z);
+      if (point) cellmesh.position.set(point.x, base_height, point.z);
     }
   };
 
   const onClick = (event) => {
+    // console on screen
+    // console.log("mouse click");
     if (current_mode === "edit") {
       if (current_edit_way === "place_a_tree") {
         place_the_ball(event);
         place_statement = "placed";
+        generate_block.enable();
       } else if (current_edit_way === "draw_a_line") {
         let point = multiplace_the_ball(event);
         points.push(point);
         curve.points = points;
+        curve.closed = guiobj["is closed"];
         if (points.length >= 2)
           curvemesh.geometry.setFromPoints(curve.getPoints(50));
+      } else if (current_edit_way === "delineate_an_area") {
+        let point = multiplace_the_ball(event);
+        points.push(point);
+        if (points.length >= 2) {
+          let linemesh = new THREE.Line(
+            new THREE.BufferGeometry().setFromPoints([
+              points.at(-2),
+              points.at(-1),
+            ]),
+            linemat
+          );
+          line_group.add(linemesh);
+          let linemesh_ = new THREE.Line(
+            new THREE.BufferGeometry().setFromPoints([
+              points.at(0),
+              points.at(-1),
+            ]),
+            linemat
+          );
+          line_group.add(linemesh_);
+          line_group.remove(line_group.children.at(-3));
+        }
       }
     }
 
@@ -165,133 +390,63 @@ const main = () => {
       let point = intersecting(event, plane);
       if (point) {
         cellmesh.material.opacity = 1;
-        cellmesh.position.set(point.x, 0, point.z);
+        cellmesh.position.set(point.x, base_height, point.z);
       }
     }
 
     function multiplace_the_ball(event) {
       let point = intersecting(event, plane);
       if (point) {
-        cellmesh.position.set(point.x, 0, point.z);
+        cellmesh.position.set(point.x, base_height, point.z);
         assistance_group.add(cellmesh.clone(false));
       }
       return point;
     }
   };
 
-  const onPointerDown = (event) => {
-    // console on screen
-    console.log("pointer down");
-
-    timer = setTimeout(() => {
-      let point = intersecting(event, plane);
-      if (point) {
-        circle.position.set(point.x, 1, point.z);
-        scene.add(circle);
-        isDaubing = true;
-      }
-      console.log("长按开始");
-    }, 1000);
-  };
-
-  const onPointerUp = (event) => {
-    clearTimeout(timer);
-    clearInterval(interval_timer);
-    canvas.removeEventListener("pointerdown", onPointerDown);
-    canvas.removeEventListener("pointermove", onPointerMove);
-    canvas.removeEventListener("pointerup", onPointerUp);
-    scene.remove(circle);
-    isDaubing = false;
-    console.log("pointer up");
-
-    // rasterization
-    let lastcell = new THREE.Vector3().addScalar(Infinity);
-    points.forEach((point) => {
-      let cell = point
-        .divideScalar(unit)
-        .floor()
-        .multiplyScalar(unit)
-        .addScalar(unit / 2)
-        .setY(0);
-      if (!lastcell.equals(cell)) cells.push(cell);
-      lastcell = cell;
-    });
-
-    let skeleton = builder.buildSkeleton();
-    let tree = builder.buildTree(skeleton);
-    builder.clearMesh();
-    const matrices = [];
-    cells.forEach((cell) => {
-      matrices.push(
-        new THREE.Matrix4()
-          .makeRotationY(2 * Math.PI * Math.random())
-          .setPosition(cell)
-      );
-    });
-
-    let instancedTree = buildInstancedMeshGroup(tree, matrices);
-    treegroup.add(instancedTree);
-
-    cells = [];
-    points = [];
-    controls.enabled = true;
-  };
-
-  const onDoubleClick = (event) => {
-    clearTimeout(timer);
-    let point = intersecting(event, plane);
-    if (point) {
-      points.push(point);
-      let pointmesh = new THREE.Mesh(pointgeo, pointmat);
-      pointmesh.position.set(point.x, box_size / 2, point.z);
-      pointgroup.add(pointmesh);
-      canvas.removeEventListener("click", onClick);
-      canvas.removeEventListener("dblclick", onDoubleClick);
-
-      let curve = new THREE.CatmullRomCurve3(points);
-      let curvepoints = curve.getPoints(100);
-      let linemat = new THREE.LineBasicMaterial({
-        color: 0x0000ff,
-      });
-      let linegeo = new THREE.BufferGeometry().setFromPoints(curvepoints);
-      let line = new THREE.Line(linegeo, linemat);
-      pointgroup.add(line);
-
-      // rasterization
-      let lastcell = new THREE.Vector3().addScalar(Infinity);
-      curvepoints.forEach((point) => {
-        let cell = point
-          .divideScalar(unit)
-          .floor()
-          .multiplyScalar(unit)
-          .addScalar(unit / 2)
-          .setY(0);
-        if (!lastcell.equals(cell)) cells.push(cell);
-        lastcell = cell;
-      });
-
-      cells.forEach((cell) => {
-        let skeleton = builder.buildSkeleton();
-        let tree = builder.buildTree(skeleton);
-        builder.clearMesh();
-        tree.position.copy(cell);
-        treegroup.add(tree);
-      });
-
-      cells = [];
-      points = [];
-      controls.enabled = true;
-    }
-  };
-
-  function swtich_mode_to_view() {
+  function switch_mode_to_view() {
     current_mode = "view";
+    controls.enabled = true;
+  }
+
+  function terminate_edit_mode() {
+    current_mode = "view";
+    assistance_group.children.forEach((child) => {
+      child.clear();
+    });
     assistance_group.clear();
     cellmesh.material.opacity = 0.5;
     points = [];
     curve.points = [];
     controls.enabled = true;
+    generate_block.disable();
   }
+
+  function switch_mode_to_edit_(edit_way) {
+    current_mode = "edit";
+    current_edit_way = edit_way;
+    place_statement = "placing";
+    controls.enabled = false;
+  }
+
+  function is_in_polygon(point, triangles) {
+    let res = false;
+    triangles.forEach((triangle) => {
+      if (triangle.containsPoint(point)) {
+        res = true;
+        return;
+      }
+    });
+    return res;
+  }
+
+  const listeners = new Map([
+    ["mousemove", onMouseMove],
+    ["click", onClick],
+  ]);
+  listeners.forEach((listener, eventname) => {
+    canvas.addEventListener(eventname, listener);
+  });
 
   function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;
@@ -304,109 +459,6 @@ const main = () => {
     }
     return needResize;
   }
-
-  /////////////////////////////////////////////////////////////////////////////////
-  // GUI
-  const listeners = new Map([
-    ["mousemove", onMouseMove],
-    ["click", onClick],
-  ]);
-  listeners.forEach((listener, eventname) => {
-    canvas.addEventListener(eventname, listener);
-  });
-  const guiobj = {
-    "sample number": 0,
-    "is closed": false,
-    "place a tree": function () {
-      assistance_group.add(cellmesh);
-      current_mode = "edit";
-      current_edit_way = "place_a_tree";
-      place_statement = "placing";
-      controls.enabled = false;
-    },
-    "draw a line": function () {
-      assistance_group.add(cellmesh);
-      assistance_group.add(curvemesh);
-      current_mode = "edit";
-      current_edit_way = "draw_a_line";
-      place_statement = "placing";
-      controls.enabled = false;
-    },
-    "spread an area": function () {},
-    "delineate an area": function () {},
-    view: function () {
-      swtich_mode_to_view();
-    },
-    "delete all": function () {
-      scene.remove(treegroup);
-      scene.remove(pointgroup);
-    },
-    "Ordinary tree": function () {
-      treeObj = customizeTree.getTree("普通乔木");
-      builder.init(treeObj, true);
-    },
-    "Chinese huai": function () {
-      treeObj = customizeTree.getTree("国槐");
-      builder.init(treeObj, true);
-    },
-    "Gui flower": function () {
-      treeObj = customizeTree.getTree("桂花");
-      builder.init(treeObj, true);
-    },
-    "Mu furong": function () {
-      treeObj = customizeTree.getTree("红枫");
-      builder.init(treeObj, true);
-    },
-    "Sweet zhang": function () {
-      treeObj = customizeTree.getTree("香樟");
-      builder.init(treeObj, true);
-    },
-    generate: function () {
-      if (current_mode === "edit") {
-        if (current_edit_way === "place_a_tree") {
-          let tree = builder.buildTree(builder.buildSkeleton());
-          tree.scale.set(5, 5, 5);
-          tree.position.copy(cellmesh.position);
-          treegroup.add(tree);
-        } else if (current_edit_way === "draw_a_line") {
-          let sample_points = curve.getPoints(this["sample number"]);
-          let tree = builder.buildTree(builder.buildSkeleton());
-          sample_points.forEach((sample_point) => {
-            let eachtree = tree.clone();
-            eachtree.scale.set(5, 5, 5);
-            eachtree.position.copy(sample_point);
-            treegroup.add(eachtree);
-          });
-        }
-      }
-      swtich_mode_to_view();
-      builder.clearMesh();
-    },
-  };
-  const gui = new GUI();
-
-  const mode_folder = gui.addFolder("MODE");
-  mode_folder.add(guiobj, "view");
-  mode_folder.add(guiobj, "delete all");
-
-  const tree_folder = gui.addFolder("TREE");
-  tree_folder.add(guiobj, "Ordinary tree");
-  tree_folder.add(guiobj, "Chinese huai");
-  tree_folder.add(guiobj, "Gui flower");
-  tree_folder.add(guiobj, "Mu furong");
-  tree_folder.add(guiobj, "Sweet zhang");
-
-  const generate_folder = gui.addFolder("GENERATOR");
-  generate_folder.add(guiobj, "generate");
-
-  const edit_folder = mode_folder.addFolder("edit");
-  edit_folder.add(guiobj, "place a tree");
-  const draw_line_folder = edit_folder.addFolder("draw a line");
-  draw_line_folder.add(guiobj, "draw a line"); // 划线
-  draw_line_folder.add(guiobj, "sample number", 1, 100, 1);
-  draw_line_folder.add(guiobj, "is closed");
-  // edit_folder.add(guiobj, "spread an area"); // 涂抹一片区域
-  edit_folder.add(guiobj, "delineate an area"); // 圈定一块区域
 
   function render() {
     // 图像不随屏幕拉伸改变

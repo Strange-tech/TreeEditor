@@ -30,3 +30,6 @@ body {
   text-align: center;
   line-height: 150%;
 }
+.control-active button {
+  color: rgb(44, 201, 255);
+}
