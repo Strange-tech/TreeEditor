@@ -95,7 +95,7 @@ const main = async () => {
       jsonarray.forEach((tree) => {
         tree.skeleton = JSON.parse(tree.skeleton);
         builder.init(tree.skeleton.treeObj, true);
-        singleTree = builder.buildTree(tree.skeleton);
+        let singleTree = builder.buildTree(tree.skeleton);
         if (!singleTree) return;
 
         if (tree.isInstanced) {
@@ -117,7 +117,7 @@ const main = async () => {
   // console.log(trees);
   // trees.forEach((tree) => {
   //   builder.init(tree.skeleton.treeObj, true);
-  //   singleTree = builder.buildTree(tree.skeleton);
+  //   let singleTree = builder.buildTree(tree.skeleton);
   //   if (!singleTree) return;
 
   //   if (tree.isInstanced) {
