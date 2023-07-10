@@ -89,47 +89,47 @@ const main = async () => {
   const customizeTree = new CustomizeTree();
   const builder = new TreeBuilder(customizeTree.getTree("普通乔木"), true);
 
-  fetch("resources/upload/hkusts.json")
-    .then((response) => response.json())
-    .then((jsonarray) => {
-      jsonarray.forEach((tree) => {
-        tree.skeleton = JSON.parse(tree.skeleton);
-        builder.init(tree.skeleton.treeObj, true);
-        let singleTree = builder.buildTree(tree.skeleton);
-        if (!singleTree) return;
+  // fetch("resources/upload/hkusts.json")
+  //   .then((response) => response.json())
+  //   .then((jsonarray) => {
+  //     jsonarray.forEach((tree) => {
+  //       tree.skeleton = JSON.parse(tree.skeleton);
+  //       builder.init(tree.skeleton.treeObj, true);
+  //       let singleTree = builder.buildTree(tree.skeleton);
+  //       if (!singleTree) return;
 
-        if (tree.isInstanced) {
-          let instancedTree = buildInstancedMeshGroup(
-            singleTree,
-            tree.matrices
-          );
-          scene.add(instancedTree);
-        } else {
-          singleTree.applyMatrix4(new THREE.Matrix4().fromArray(tree.matrix));
-          scene.add(singleTree);
-        }
-        builder.clearMesh();
-      });
-    });
+  //       if (tree.isInstanced) {
+  //         let instancedTree = buildInstancedMeshGroup(
+  //           singleTree,
+  //           tree.matrices
+  //         );
+  //         scene.add(instancedTree);
+  //       } else {
+  //         singleTree.applyMatrix4(new THREE.Matrix4().fromArray(tree.matrix));
+  //         scene.add(singleTree);
+  //       }
+  //       builder.clearMesh();
+  //     });
+  //   });
 
-  // console.time("fetch database");
-  // const trees = await getTrees();
-  // console.log(trees);
-  // trees.forEach((tree) => {
-  //   builder.init(tree.skeleton.treeObj, true);
-  //   let singleTree = builder.buildTree(tree.skeleton);
-  //   if (!singleTree) return;
+  console.time("fetch database");
+  const trees = await getTrees();
+  console.log(trees);
+  trees.forEach((tree) => {
+    builder.init(tree.skeleton.treeObj, true);
+    let singleTree = builder.buildTree(tree.skeleton);
+    if (!singleTree) return;
 
-  //   if (tree.isInstanced) {
-  //     let instancedTree = buildInstancedMeshGroup(singleTree, tree.matrices);
-  //     scene.add(instancedTree);
-  //   } else {
-  //     singleTree.applyMatrix4(new THREE.Matrix4().fromArray(tree.matrix));
-  //     scene.add(singleTree);
-  //   }
-  //   builder.clearMesh();
-  // });
-  // console.timeEnd("fetch database");
+    if (tree.isInstanced) {
+      let instancedTree = buildInstancedMeshGroup(singleTree, tree.matrices);
+      scene.add(instancedTree);
+    } else {
+      singleTree.applyMatrix4(new THREE.Matrix4().fromArray(tree.matrix));
+      scene.add(singleTree);
+    }
+    builder.clearMesh();
+  });
+  console.timeEnd("fetch database");
 
   /* 系统全局变量 */
   const raycaster = new THREE.Raycaster();
