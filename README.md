@@ -28,12 +28,12 @@
 
 ## 放置单一树木
 
-MODE/edit/place a tree -> 移动鼠标在平面点击一个点 -> 选择树木种类（如 TREE/Ordinary tree）-> 调整树木大小，浮动值，朝向等（非必选）-> GENERATOR/generate
+MODE/edit/place a tree ➡️ 移动鼠标在平面点击一个点 ➡️ 选择树木种类（如 TREE/Ordinary tree）➡️ 调整树木大小，浮动值，朝向等（非必选）➡️ GENERATOR/generate
 
 ## 划线一排树木
 
-MODE/edit/draw a line -> 选择 sample number 的值 -> 选择曲线是否封闭 -> 移动鼠标在平面点击至少两个点 -> 选择树木种类（如 TREE/Ordinary tree）-> 调整树木大小，浮动值，朝向等（非必选）-> GENERATOR/generate
+MODE/edit/draw a line ➡️ 选择 sample number 的值 ➡️ 选择曲线是否封闭 ➡️ 移动鼠标在平面点击至少两个点 ➡️ 选择树木种类（如 TREE/Ordinary tree）➡️ 调整树木大小，浮动值，朝向等（非必选）➡️ GENERATOR/generate
 
 ## 圈定范围树木
 
-MODE/edit/delineate an area -> 选择 total number 的值 -> 移动鼠标在平面点击至少三个点 -> 选择树木种类（如 TREE/Ordinary tree）-> 调整树木大小，浮动值，朝向等（非必选）-> GENERATOR/generate
+MODE/edit/delineate an area ➡️ 选择 total number 的值 ➡️ 移动鼠标在平面点击至少三个点 ➡️ 选择树木种类（如 TREE/Ordinary tree）➡️ 调整树木大小，浮动值，朝向等（非必选）➡️ GENERATOR/generate

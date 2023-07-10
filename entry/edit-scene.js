@@ -5,8 +5,34 @@ import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
 import { TreeBuilder } from "../TreeBuilder";
 import { CustomizeTree } from "../CustomizeTree";
 import { randomRangeLinear } from "../utilities";
+import { getTrees, createTree } from "../AxiosApi";
 
-const main = () => {
+const buildInstancedMeshGroup = function (singleTree, matricesArr) {
+  const instancedMeshGroup = new THREE.Group();
+  const instancedMeshes = [];
+  // singleTree is a THREE.Group
+  singleTree.children.forEach((child) => {
+    instancedMeshes.push(
+      new THREE.InstancedMesh(
+        child.geometry,
+        child.material,
+        matricesArr.length
+      )
+    );
+  });
+  matricesArr.forEach((matrixArr, index) => {
+    instancedMeshes.forEach((instancedMesh) => {
+      instancedMesh.setMatrixAt(
+        index,
+        new THREE.Matrix4().fromArray(matrixArr)
+      );
+    });
+  });
+  instancedMeshGroup.add(...instancedMeshes);
+  return instancedMeshGroup;
+};
+
+const main = async () => {
   const canvas = document.querySelector("#c");
   const renderer = new THREE.WebGLRenderer({ canvas: canvas });
   // renderer.outputEncoding = THREE.sRGBEncoding;
@@ -49,7 +75,6 @@ const main = () => {
 
   const geometry = new THREE.PlaneGeometry(size, size);
   geometry.rotateX(-Math.PI / 2);
-
   const plane = new THREE.Mesh(
     geometry,
     new THREE.MeshBasicMaterial({ visible: false })
@@ -58,20 +83,59 @@ const main = () => {
 
   const loader = new GLTFLoader();
   loader.load("resources/upload/model3.glb", (glb) => {
-    // console.log(glb.scene);
     scene.add(glb.scene);
   });
 
-  /* 系统全局变量 */
   const customizeTree = new CustomizeTree();
-  let treeObj = customizeTree.getTree("普通乔木"); // default species
-  const builder = new TreeBuilder(treeObj, true);
+  const builder = new TreeBuilder(customizeTree.getTree("普通乔木"), true);
 
+  fetch("resources/upload/hkusts.json")
+    .then((response) => response.json())
+    .then((jsonarray) => {
+      jsonarray.forEach((tree) => {
+        tree.skeleton = JSON.parse(tree.skeleton);
+        builder.init(tree.skeleton.treeObj, true);
+        singleTree = builder.buildTree(tree.skeleton);
+        if (!singleTree) return;
+
+        if (tree.isInstanced) {
+          let instancedTree = buildInstancedMeshGroup(
+            singleTree,
+            tree.matrices
+          );
+          scene.add(instancedTree);
+        } else {
+          singleTree.applyMatrix4(new THREE.Matrix4().fromArray(tree.matrix));
+          scene.add(singleTree);
+        }
+        builder.clearMesh();
+      });
+    });
+
+  // console.time("fetch database");
+  // const trees = await getTrees();
+  // console.log(trees);
+  // trees.forEach((tree) => {
+  //   builder.init(tree.skeleton.treeObj, true);
+  //   singleTree = builder.buildTree(tree.skeleton);
+  //   if (!singleTree) return;
+
+  //   if (tree.isInstanced) {
+  //     let instancedTree = buildInstancedMeshGroup(singleTree, tree.matrices);
+  //     scene.add(instancedTree);
+  //   } else {
+  //     singleTree.applyMatrix4(new THREE.Matrix4().fromArray(tree.matrix));
+  //     scene.add(singleTree);
+  //   }
+  //   builder.clearMesh();
+  // });
+  // console.timeEnd("fetch database");
+
+  /* 系统全局变量 */
   const raycaster = new THREE.Raycaster();
   let pointer = new THREE.Vector2();
   let points = [];
   let cells = [];
-  let timer, interval_timer;
   const cellgeo = new THREE.SphereGeometry(unit / 2);
   const cellmat = new THREE.MeshBasicMaterial({
     color: "red",
@@ -105,7 +169,7 @@ const main = () => {
   let current_mode = "view"; // ["view", "edit"]
   let current_edit_way = "place_a_tree"; // ["place_a_tree", "draw_a_line", "spread_an_area", "delineate_an_area"]
   let place_statement = "placing"; // ["placing", "placed"]
-  let current_tree = "Ordinary tree";
+  let scene_meta_data = [];
 
   const base_height = 5.5;
 
@@ -143,59 +207,86 @@ const main = () => {
       scene.remove(treegroup);
       scene.remove(pointgroup);
     },
+    save: function () {
+      scene_meta_data.forEach((metadata) => {
+        let { skeleton, isInstanced, matrixArr, matricesArr } = metadata;
+        createTree(skeleton, isInstanced, matrixArr, matricesArr);
+      });
+      scene_meta_data = [];
+    },
     "Ordinary tree": function () {
       activate_tree("Ordinary tree");
-      treeObj = new CustomizeTree().getTree("普通乔木");
+      treeObj = customizeTree.getTree("普通乔木");
       builder.init(treeObj, true);
     },
     "Chinese huai": function () {
       activate_tree("Chinese huai");
-      treeObj = new CustomizeTree().getTree("国槐");
+      treeObj = customizeTree.getTree("国槐");
       builder.init(treeObj, true);
     },
     "Gui flower": function () {
       activate_tree("Gui flower");
-      treeObj = new CustomizeTree().getTree("桂花");
+      treeObj = customizeTree.getTree("桂花");
       builder.init(treeObj, true);
     },
     "Mu furong": function () {
       activate_tree("Mu furong");
-      treeObj = new CustomizeTree().getTree("木芙蓉");
+      treeObj = customizeTree.getTree("木芙蓉");
       builder.init(treeObj, true);
     },
     "Sweet zhang": function () {
       activate_tree("Sweet zhang");
-      treeObj = new CustomizeTree().getTree("香樟");
+      treeObj = customizeTree.getTree("香樟");
       builder.init(treeObj, true);
     },
     generate: function () {
-      let tree = builder.buildTree(builder.buildSkeleton());
+      let tree_skeleton = builder.buildSkeleton();
+      let tree = builder.buildTree(tree_skeleton);
       let volatility = this["size volatility"] * this["size"];
-      let random_matrices = [];
+      let random_matrices_array = [];
       if (current_mode === "edit") {
         if (current_edit_way === "place_a_tree") {
-          tree.scale
-            .setScalar(this["size"])
-            .addScalar(randomRangeLinear(-volatility, volatility));
-          tree.rotateY(
-            this["random orientation"] ? Math.random() * 2 * Math.PI : 0
+          let { metadata, modified_tree } = modifyATree(
+            tree_skeleton,
+            tree,
+            this["size"],
+            volatility,
+            cellmesh.position
           );
-          tree.position.copy(cellmesh.position);
-          treegroup.add(tree);
+          scene_meta_data.push(metadata);
+          treegroup.add(modified_tree);
         } else if (current_edit_way === "draw_a_line") {
           curve.closed = this["is closed"];
           let sample_points = curve.getPoints(this["sample number"] - 1);
           if (this["mesh instanced"]) {
             sample_points.forEach((p) => {
-              random_matrices.push(
-                new THREE.Matrix4().makeTranslation(p.x, p.y, p.z)
-              );
+              let size = new THREE.Vector3()
+                .setScalar(this["size"])
+                .addScalar(randomRangeLinear(-volatility, volatility));
+              let matrix = new THREE.Matrix4()
+                .multiply(new THREE.Matrix4().makeTranslation(p.x, p.y, p.z))
+                .multiply(
+                  new THREE.Matrix4().makeScale(size.x, size.y, size.z)
+                );
+              random_matrices_array.push(matrix.elements);
             });
-            treegroup.add(buildInstancedMeshGroup(tree, random_matrices));
+            scene_meta_data.push({
+              skeleton: tree_skeleton,
+              isInstanced: true,
+              matrixArr: [],
+              matricesArr: random_matrices_array,
+            });
+            treegroup.add(buildInstancedMeshGroup(tree, random_matrices_array));
           } else {
             sample_points.forEach((p) => {
-              let eachtree = tree.clone();
-              eachtree.position.copy(p);
+              let { metadata, eachtree } = modifyATree(
+                tree_skeleton,
+                tree,
+                this["size"],
+                volatility,
+                p
+              );
+              scene_meta_data.push(metadata);
               treegroup.add(eachtree);
             });
           }
@@ -213,23 +304,35 @@ const main = () => {
           let box2 = new THREE.Box2().setFromPoints(vector2s);
           let cnt = 0;
           while (cnt < this["total number"]) {
+            let size = new THREE.Vector3()
+              .setScalar(this["size"])
+              .addScalar(randomRangeLinear(-volatility, volatility));
             let random_point = new THREE.Vector3(
               randomRangeLinear(box2.min.x, box2.max.x),
               base_height,
               randomRangeLinear(box2.min.y, box2.max.y)
             );
-            if (is_in_polygon(random_point, triangles)) {
-              random_matrices.push(
+            let matrix = new THREE.Matrix4()
+              .multiply(
                 new THREE.Matrix4().makeTranslation(
                   random_point.x,
                   random_point.y,
                   random_point.z
                 )
-              );
+              )
+              .multiply(new THREE.Matrix4().makeScale(size.x, size.y, size.z));
+            if (is_in_polygon(random_point, triangles)) {
+              random_matrices_array.push(matrix.elements);
               cnt++;
             }
           }
-          treegroup.add(buildInstancedMeshGroup(tree, random_matrices));
+          scene_meta_data.push({
+            skeleton: tree_skeleton,
+            isInstanced: true,
+            matrixArr: [],
+            matricesArr: random_matrices_array,
+          });
+          treegroup.add(buildInstancedMeshGroup(tree, random_matrices_array));
         }
       }
       terminate_edit_mode();
@@ -241,6 +344,7 @@ const main = () => {
   const mode_folder = gui.addFolder("MODE");
   mode_folder.add(guiobj, "view");
   mode_folder.add(guiobj, "delete all");
+  mode_folder.add(guiobj, "save");
 
   const tree_folder = gui.addFolder("TREE");
   const tree_folder_controller = [];
@@ -292,22 +396,32 @@ const main = () => {
     });
   };
 
-  const buildInstancedMeshGroup = function (singleTree, matrices) {
-    const instancedMeshGroup = new THREE.Group();
-    const instancedMeshes = [];
-    // singleTree is a THREE.Group
-    singleTree.children.forEach((child) => {
-      instancedMeshes.push(
-        new THREE.InstancedMesh(child.geometry, child.material, matrices.length)
+  const modifyATree = function (
+    tree_skeleton,
+    tree,
+    size,
+    volatility,
+    position
+  ) {
+    let scale = new THREE.Vector3()
+      .setScalar(size)
+      .addScalar(randomRangeLinear(-volatility, volatility));
+    let matrix = new THREE.Matrix4()
+      .multiply(new THREE.Matrix4().makeScale(scale.x, scale.y, scale.z))
+      .multiply(
+        new THREE.Matrix4().makeTranslation(position.x, position.y, position.z)
       );
-    });
-    matrices.forEach((matrix, index) => {
-      instancedMeshes.forEach((instancedMesh) => {
-        instancedMesh.setMatrixAt(index, matrix);
-      });
-    });
-    instancedMeshGroup.add(...instancedMeshes);
-    return instancedMeshGroup;
+    tree.applyMatrix4(matrix);
+    let ret = {
+      metadata: {
+        skeleton: tree_skeleton,
+        isInstanced: false,
+        matrixArr: matrix.elements,
+        matricesArr: [],
+      },
+      modified_tree: tree,
+    };
+    return ret;
   };
 
   const intersecting = (event, object) => {
