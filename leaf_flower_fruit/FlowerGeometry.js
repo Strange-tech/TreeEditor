@@ -6,9 +6,7 @@ import * as THREE from "three";
  *
  *************************************************************************************/
 class FlowerGeometry {
-  constructor(scale) {
-    this.scale = scale;
-  }
+  constructor() {}
   generate() {
     const geometry = new THREE.BufferGeometry();
     const vertices = [

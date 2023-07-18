@@ -6,8 +6,8 @@ import {
   makeVector3,
   makeVectors,
 } from "./utilities";
-import { LeafGeometry } from "./leaf/LeafGeometry";
-import { FlowerGeometry } from "./flower/FlowerGeometry";
+import { LeafGeometry } from "./leaf_flower_fruit/LeafGeometry";
+import { FlowerGeometry } from "./leaf_flower_fruit/FlowerGeometry";
 import { TreeSkeleton } from "./TreeSkeleton";
 import { BranchTubeGeometry } from "./lib/BranchTubeGeometry";
 import { kMeans } from "./lib/Cluster";
@@ -30,7 +30,10 @@ class TreeBuilder {
     this.branchGeometries = [];
     this.cnt = 0; // 叶子计数器
     this.mergeLeaves = mergeLeaves;
-    if (mergeLeaves) this.matrices = [];
+    if (mergeLeaves) {
+      this.leaf_matrices = [];
+      this.flower_matrices = [];
+    }
     if (verticalAxis === "y-axis")
       this.verticalAxis = new THREE.Vector3(0, 1, 0);
     else if (verticalAxis === "z-axis")
@@ -40,7 +43,10 @@ class TreeBuilder {
   init(treeObj, mergeLeaves = true, verticalAxis = "y-axis") {
     this.treeObj = treeObj;
     this.mergeLeaves = mergeLeaves;
-    if (mergeLeaves) this.matrices = [];
+    if (mergeLeaves) {
+      this.leaf_matrices = [];
+      this.flower_matrices = [];
+    }
     if (verticalAxis === "y-axis")
       this.verticalAxis = new THREE.Vector3(0, 1, 0);
     else if (verticalAxis === "z-axis")
@@ -54,7 +60,10 @@ class TreeBuilder {
   clearMesh() {
     this.branchGeometries = [];
     this.cnt = 0;
-    if (this.mergeLeaves) this.matrices = [];
+    if (this.mergeLeaves) {
+      this.leaf_matrices = [];
+      this.flower_matrices = [];
+    }
   }
 
   randomMatrices(
@@ -187,8 +196,11 @@ class TreeBuilder {
     if (skeleton.children.length === 0) {
       // 叶子节点
       const leaves = this.treeObj.branches.at(-1).leaves;
+      const flowers = this.treeObj.branches.at(-1).flowers;
+      let matrices1, matrices2;
       for (let i = 0; i < leaves.length; i++) {
-        let matrices = this.randomMatrices(
+        // leaf
+        matrices1 = this.randomMatrices(
           curve,
           points,
           leaves[i][0],
@@ -197,7 +209,25 @@ class TreeBuilder {
           leaves[i][3],
           leaves[i][4]
         );
-        if (this.mergeLeaves) this.matrices.push(...matrices);
+        // flower
+        if (flowers) {
+          matrices2 = this.randomMatrices(
+            curve,
+            points,
+            flowers[i][0],
+            flowers[i][1],
+            flowers[i][2],
+            flowers[i][3],
+            flowers[i][4]
+          );
+        }
+        if (this.mergeLeaves) {
+          this.leaf_matrices.push(...matrices1);
+          if (this.treeObj.flower && flowers)
+            this.flower_matrices.push(...matrices2);
+          if (this.treeObj.flower && !flowers)
+            this.flower_matrices.push(...matrices1);
+        }
       }
     }
 
@@ -306,8 +336,14 @@ class TreeBuilder {
   // public
   buildTree(skeleton) {
     if (skeleton.children.length === 0) return;
-    const { treeObj, branchGeometries, mergeLeaves, matrices, verticalAxis } =
-      this;
+    const {
+      treeObj,
+      branchGeometries,
+      mergeLeaves,
+      leaf_matrices,
+      flower_matrices,
+      verticalAxis,
+    } = this;
 
     const loader = new THREE.TextureLoader();
     const g = treeObj.leaf.geometry;
@@ -356,7 +392,7 @@ class TreeBuilder {
     // 3. 合并方式做树叶，递归函数后创建mesh
     if (mergeLeaves) {
       const leafGeometries = [];
-      matrices.forEach((matrix) => {
+      leaf_matrices.forEach((matrix) => {
         leafGeometries.push(
           new LeafGeometry(
             g.style,
@@ -376,7 +412,7 @@ class TreeBuilder {
 
       if (treeObj.flower) {
         const flowerGeometries = [];
-        matrices.forEach((matrix) => {
+        flower_matrices.forEach((matrix) => {
           flowerGeometries.push(
             new FlowerGeometry()
               .generate()

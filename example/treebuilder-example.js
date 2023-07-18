@@ -12,7 +12,7 @@ async function main() {
   renderer.shadowMap.enabled = true;
 
   const scene = new THREE.Scene();
-  // scene.background = new THREE.Color(0xffffff);
+  scene.background = new THREE.Color(0xcccccc);
 
   const fov = 45;
   const aspect = 2;
@@ -76,7 +76,7 @@ async function main() {
   };
 
   const customizeTree = new CustomizeTree();
-  let treeObj = customizeTree.getTree("普通乔木");
+  let treeObj = customizeTree.getTree("八棱海棠");
 
   builder.init(treeObj, true, "y-axis");
   let skeleton = builder.buildSkeleton();
@@ -110,34 +110,53 @@ async function main() {
     console.log(singleTree);
   }
 
+  const species = Array.from(customizeTree.indices.keys());
   const guiobj = {
-    "Ordinary tree": function () {
-      buildtree("普通乔木");
+    普通乔木: function () {
+      buildtree(species[0]);
     },
-    "Chinese huai": function () {
-      buildtree("国槐");
+    桂花: function () {
+      buildtree(species[1]);
     },
-    "Gui flower": function () {
-      buildtree("桂花");
+    国槐: function () {
+      buildtree(species[2]);
     },
-    "Red maple": function () {
-      buildtree("红枫");
+    木芙蓉: function () {
+      buildtree(species[3]);
     },
-    "Sweet zhang": function () {
-      buildtree("香樟");
+    八棱海棠: function () {
+      buildtree(species[4]);
     },
-    "Mu Furong": function () {
-      buildtree("木芙蓉");
+    红枫: function () {
+      buildtree(species[5]);
+    },
+    桃树: function () {
+      buildtree(species[6]);
+    },
+    垂丝海棠: function () {
+      buildtree(species[7]);
+    },
+    丁香: function () {
+      buildtree(species[8]);
+    },
+    香樟: function () {
+      buildtree(species[9]);
+    },
+    凤凰木: function () {
+      buildtree(species[10]);
+    },
+    海棠: function () {
+      buildtree(species[11]);
+    },
+    红果冬青: function () {
+      buildtree(species[12]);
     },
   };
   const gui = new GUI();
   const tree_selector = gui.addFolder("tree");
-  tree_selector.add(guiobj, "Ordinary tree");
-  tree_selector.add(guiobj, "Chinese huai");
-  tree_selector.add(guiobj, "Gui flower");
-  tree_selector.add(guiobj, "Red maple");
-  tree_selector.add(guiobj, "Sweet zhang");
-  tree_selector.add(guiobj, "Mu Furong");
+  species.forEach((s) => {
+    tree_selector.add(guiobj, s);
+  });
 
   function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;

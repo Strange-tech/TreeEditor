@@ -18,6 +18,7 @@ class LeafGeometry {
   generate() {
     const { style } = this;
     if (style === "folded") return this.generateFolded();
+    else if (style === "folded_reverse") return this.generateFolded2();
     else if (style === "classic") return this.generateClassic();
     else if (style === "tile") return this.generateTile();
     else if (style === "cross") return this.generateCross();
@@ -52,6 +53,10 @@ class LeafGeometry {
     if (verticalAxis === "z-axis")
       geometry.rotateX(Math.PI / 2).rotateZ(Math.PI / 2);
     return geometry;
+  }
+
+  generateFolded2() {
+    return this.generateFolded().rotateZ(Math.PI).translate(0, this.height, 0);
   }
 
   generateClassic() {

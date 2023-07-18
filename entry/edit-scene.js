@@ -35,7 +35,6 @@ const buildInstancedMeshGroup = function (singleTree, matricesArr) {
 const main = async () => {
   const canvas = document.querySelector("#c");
   const renderer = new THREE.WebGLRenderer({ canvas: canvas });
-  // renderer.outputEncoding = THREE.sRGBEncoding;
   renderer.setClearColor(0xffffff, 1.0);
 
   /* 基本场景 */
@@ -87,7 +86,8 @@ const main = async () => {
   });
 
   const customizeTree = new CustomizeTree();
-  const builder = new TreeBuilder(customizeTree.getTree("普通乔木"), true);
+  let treeObj = customizeTree.getTree("普通乔木");
+  const builder = new TreeBuilder(treeObj, true);
 
   // fetch("resources/upload/hkusts.json")
   //   .then((response) => response.json())
