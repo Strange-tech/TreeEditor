@@ -127,7 +127,8 @@ class TreeBuilder {
   buildSkeletonRec(start, end, fatherSkeleton, depth = 0) {
     if (depth > this.treeObj.depth) return;
 
-    let disturb = depth === this.treeObj.depth ? 0 : this.treeObj.disturb;
+    // let disturb = depth === this.treeObj.depth ? 0 : this.treeObj.disturb;
+    let disturb = this.treeObj.disturb;
     let gravity = this.treeObj.gravity;
     const nodes = disturbedCurveNode(
       makeVector3(start),

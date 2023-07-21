@@ -2,11 +2,8 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
 import { TreeBuilder } from "../TreeBuilder";
-import { getTrees } from "../AxiosApi";
 import { CustomizeTree } from "../CustomizeTree";
 import { drawLine, drawPoints, lookAt } from "../utilities";
-import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils";
-import { LeafGeometry } from "../leaf_flower_fruit/LeafGeometry";
 
 async function main() {
   const canvas = document.querySelector("#c");
@@ -14,14 +11,14 @@ async function main() {
   renderer.shadowMap.enabled = true;
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xcccccc);
+  scene.background = new THREE.Color(0xffffff);
 
   const fov = 45;
   const aspect = 2;
   const near = 0.1;
   const far = 10000;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  camera.position.set(100, 70, 0);
+  camera.position.set(200, 70, 0);
 
   const controls = new OrbitControls(camera, canvas);
   controls.target.set(0, 10, 0);
@@ -41,7 +38,7 @@ async function main() {
   scene.add(dirlight);
 
   const axesHelper = new THREE.AxesHelper(5);
-  scene.add(axesHelper);
+  // scene.add(axesHelper);
 
   const planeSize = 20;
   const plainGeometry = new THREE.PlaneGeometry(planeSize, planeSize, 10, 10);
@@ -55,7 +52,7 @@ async function main() {
   );
   // plain.castShadow = true;
   plain.receiveShadow = true;
-  scene.add(plain);
+  // scene.add(plain);
 
   const builder = new TreeBuilder();
 
@@ -78,19 +75,10 @@ async function main() {
   };
 
   const customizeTree = new CustomizeTree();
-  let treeObj = customizeTree.getTree("八棱海棠");
+  let treeObj = customizeTree.getTree("海棠");
 
   builder.init(treeObj, true, "y-axis");
   let skeleton = builder.buildSkeleton();
-
-  // skeleton line
-  // const curve = new THREE.Group();
-  // const pointGroup = new THREE.Group();
-  // drawLine(skeleton.children[0], curve, pointGroup);
-  // scene.add(curve);
-  // scene.add(pointGroup);
-
-  let lod1;
   let singleTree = builder.buildTree(skeleton);
   singleTree.children.forEach((child) => {
     child.castShadow = true;
@@ -101,7 +89,6 @@ async function main() {
 
   function buildtree(species) {
     scene.remove(singleTree);
-    scene.remove(lod1);
     builder.clearMesh();
     treeObj = customizeTree.getTree(species);
     builder.init(treeObj, true);
@@ -112,19 +99,6 @@ async function main() {
     });
     scene.add(singleTree);
     console.log(singleTree);
-    let loader = new THREE.TextureLoader();
-    let texture1 = loader.load(`${treeObj.path}texture.png`);
-    texture1.colorSpace = THREE.SRGBColorSpace;
-    let geometry = new LeafGeometry("cross", 10, 10).generate();
-    let material = new THREE.MeshBasicMaterial({
-      map: texture1,
-      side: THREE.DoubleSide,
-      alphaTest: 0.5,
-    });
-    lod1 = new THREE.Mesh(geometry, material);
-    lod1.position.set(20, 0, 0);
-    console.log(geometry);
-    scene.add(lod1);
   }
 
   const species = Array.from(customizeTree.indices.keys());
@@ -187,7 +161,7 @@ async function main() {
     return needResize;
   }
 
-  function render() {
+  function capture() {
     // 图像不随屏幕拉伸改变
     if (resizeRendererToDisplaySize(renderer)) {
       const canvas = renderer.domElement;
@@ -195,13 +169,22 @@ async function main() {
       camera.updateProjectionMatrix();
     }
     renderer.render(scene, camera);
+    const imageURL = renderer.domElement.toDataURL("image/png");
+    var anchor = document.createElement("a");
+    anchor.href = imageURL;
+    anchor.download = "preview.png";
+    anchor.click();
   }
 
   function animate() {
     requestAnimationFrame(animate);
     render();
   }
-  animate();
+
+  setTimeout(() => {
+    capture();
+  }, 2000);
+  // animate();
 }
 
 main();

@@ -97,7 +97,7 @@ const lookAt = (obj, camera, controls) => {
   const boxSize = box.getSize(new THREE.Vector3()).length();
   const boxCenter = box.getCenter(new THREE.Vector3());
   // set the camera to frame the box
-  frameArea(boxSize * 0.5, boxSize, boxCenter, camera);
+  frameArea(boxSize * 0.7, boxSize, boxCenter, camera);
   // update the Trackball controls to handle the new size
   controls.maxDistance = boxSize * 100;
   controls.target.copy(boxCenter);

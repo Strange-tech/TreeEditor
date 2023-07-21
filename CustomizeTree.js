@@ -17,54 +17,54 @@ class CustomizeTree {
       ["桃树", 6],
       ["垂丝海棠", 7],
       ["丁香", 8],
-      ["香樟", 9],
-      ["凤凰木", 10],
-      ["海棠", 11],
-      ["红果冬青", 12],
+      ["凤凰木", 9],
+      // ["海棠", 10],
+      // ["红果冬青", 11],
     ]);
     this.content = [
       {
         name: "普通乔木",
-        path: "resources/images/fgwt/",
+        path: "resources/images/ordinarytree/",
         depth: 2,
-        disturb: 0.01,
-        gravity: 10,
-        shrink: { single: 0.3, multi: 0.3, root: true },
+        disturb: 0.02,
+        gravity: 1,
+        shrink: { single: 0.4, multi: 0.4, root: true },
         tubular_segments: 10,
         radial_segments: 6,
         sample_offset: 0.005,
         leaf: {
-          geometry: { style: "cross", width: 1, height: 1 },
-          scale: 2,
-          alphaTest: 0.5,
+          geometry: { style: "cross", width: 0.7, height: 1 },
+          scale: 3,
+          alphaTest: 0.3,
         },
         branches: [
           // root node
           {
             start: new THREE.Vector3(0, 0, 0),
-            end: new THREE.Vector3(0, 10, 0),
-            radius: 0.3,
+            end: new THREE.Vector3(0, 17, 0),
+            radius: 0.6,
             fork: [
               // [ fork_position, noise1, fork_angle, noise2, next_level_length, noise3, number ]
-              [0.4, 0.05, Math.PI / 2.5, Math.PI / 36, 4, 0.5, 5],
-              [0.5, 0.04, Math.PI / 3, 0, 3, 0.5, 4],
-              [0.6, 0.04, Math.PI / 5, 0, 3, 0.5, 4],
-              [0.7, 0.03, Math.PI / 6, 0, 3, 0.5, 3],
-              [0.9, 0, 0, 0, 2, 1, 1],
+              [0.4, 0.1, Math.PI / 2.5, Math.PI / 36, 7, 0.5, 6],
+              [0.5, 0.05, Math.PI / 3, 0, 7, 0.5, 3],
+              [0.6, 0.05, Math.PI / 5, 0, 6, 0.5, 3],
+              [0.7, 0.05, Math.PI / 6, 0, 5, 0.5, 3],
+              [0.95, 0, 0, 0, 4, 0.5, 1],
             ],
           },
           // middle node
           {
             fork: [
-              [0.5, 0.1, Math.PI / 5, Math.PI / 36, 2, 0.5, 2],
-              [0.8, 0.1, Math.PI / 5, 0, 1, 0.5, 2],
+              [0.7, 0.1, Math.PI / 4, Math.PI / 36, 3, 0.5, 3],
+              [0.9, 0, 0, 0, 3, 0.5, 1],
             ],
           },
           // leaf node
           {
             leaves: [
               // [ leaves_position, noise1, leaves_angle, noise2, number]
-              [0.6, 0.4, Math.PI / 5, 0, 3],
+              [0.6, 0.35, Math.PI / 3, 0, 6],
+              [0.95, 0, 0, 0, 1],
             ],
           },
         ],
@@ -112,9 +112,9 @@ class CustomizeTree {
         name: "国槐",
         path: "resources/images/guohuai/",
         depth: 5,
-        disturb: 0.02,
-        gravity: 2,
-        shrink: { single: 0.4, multi: 0.4, root: true },
+        disturb: 0.03,
+        gravity: 3,
+        shrink: { single: 0.4, multi: 0.45, root: true },
         tubular_segments: 5,
         radial_segments: 6,
         sample_offset: 0.01,
@@ -127,17 +127,20 @@ class CustomizeTree {
           // root node
           {
             start: new THREE.Vector3(0, 0, 0),
-            end: new THREE.Vector3(0, 10, 0),
-            radius: 0.5,
+            end: new THREE.Vector3(0, 15, 0),
+            radius: 0.7,
             fork: [
-              [0.5, 0.1, Math.PI / 4, Math.PI / 36, 4, 0.5, 3],
-              [0.8, 0.1, Math.PI / 4, Math.PI / 36, 4, 0.5, 3],
-              [0.9, 0, 0, 0, 3, 0.5, 1],
+              [0.5, 0.1, Math.PI / 3, Math.PI / 36, 7, 0.5, 5],
+              [0.8, 0.1, Math.PI / 4, Math.PI / 36, 6, 0.5, 3],
+              [0.95, 0, 0, 0, 5, 0.5, 1],
             ],
           },
           // middle node
           {
-            fork: [[0.6, 0.2, Math.PI / 5, Math.PI / 36, 3, 0.5, 3]],
+            fork: [
+              [0.6, 0.2, Math.PI / 5, Math.PI / 36, 3, 0.5, 3],
+              [0.95, 0, 0, 0, 3, 0.5, 1],
+            ],
           },
           {
             fork: [[0.6, 0.2, Math.PI / 5, Math.PI / 36, 2, 0.5, 3]],
@@ -146,11 +149,14 @@ class CustomizeTree {
             fork: [[0.6, 0.3, Math.PI / 5, Math.PI / 36, 1, 0.5, 3]],
           },
           {
-            fork: [[0.5, 0.4, Math.PI / 5, Math.PI / 36, 0.5, 0.2, 3]],
+            fork: [
+              [0.5, 0.4, Math.PI / 5, Math.PI / 36, 2, 0, 3],
+              [0.95, 0, 0, 0, 2, 0, 1],
+            ],
           },
           // leaf node
           {
-            leaves: [[0.5, 0.4, Math.PI / 6, 0, 5]],
+            leaves: [[0.6, 0.4, Math.PI / 5, 0, 8]],
           },
         ],
       },
@@ -452,59 +458,6 @@ class CustomizeTree {
         ],
       },
       {
-        name: "香樟",
-        path: "resources/images/xiangzhang/",
-        depth: 4,
-        disturb: 0.1,
-        gravity: 0,
-        shrink: { single: 0.95, multi: 0.5, root: true },
-        segment: 10,
-        angle: Math.PI / 2,
-        leaves: {
-          geometry: {
-            style: "cross_and_reverse",
-            width: 1,
-            height: 1,
-            foldDegree: 0.3,
-          },
-          scale: 2.5,
-          total: 1000,
-          each: 10,
-          alphaTest: 0.3,
-        },
-        branches: [
-          // root node
-          {
-            start: new THREE.Vector3(0, 0, 0),
-            end: new THREE.Vector3(0, 5, 0),
-            radius: 0.6,
-            fork: { min: 0.8, max: 1 },
-          },
-          // middle node
-          {
-            number: 4,
-            length: { min: 5, max: 6 },
-            fork: { min: 0.5, max: 1 },
-          },
-          {
-            number: 2,
-            length: { min: 3, max: 4 },
-            fork: { min: 0.5, max: 1 },
-          },
-          {
-            number: 2,
-            length: { min: 2, max: 3 },
-            fork: { min: 0.1, max: 1 },
-          },
-          // leaf node
-          {
-            number: 2,
-            length: { min: 1, max: 2 },
-            fork: { min: 0.1, max: 1 },
-          },
-        ],
-      },
-      {
         name: "凤凰木",
         path: "resources/images/fenghuangmu/",
         depth: 3,
@@ -557,108 +510,108 @@ class CustomizeTree {
           },
         ],
       },
-      {
-        name: "海棠",
-        path: "resources/images/haitang/",
-        depth: 3,
-        disturb: 0.03,
-        gravity: 3,
-        shrink: { single: 0.2, multi: 0.35, root: true },
-        tubular_segments: 10,
-        radial_segments: 4,
-        sample_offset: 0.005,
-        leaf: {
-          geometry: { style: "folded", width: 0.5, height: 1 },
-          scale: 0.3,
-          alphaTest: 0.5,
-        },
-        flower: {
-          scale: 0.1,
-          alphaTest: 0.5,
-        },
-        branches: [
-          // root node
-          {
-            start: new THREE.Vector3(0, 0, 0),
-            end: new THREE.Vector3(0, 10, 0),
-            radius: 0.25,
-            fork: [
-              [0.4, 0.05, Math.PI / 3, 0, 4.5, 0, 6],
-              [0.5, 0.1, Math.PI / 4, 0, 4, 0, 4],
-              [0.6, 0.1, Math.PI / 5, 0, 2, 0, 4],
-              [0.8, 0, 0, 0, 1, 0.5, 1],
-            ],
-          },
-          // middle node
-          {
-            fork: [
-              [0.4, 0.2, Math.PI / 5, 0, 2, 0.5, 3],
-              [0.7, 0.2, Math.PI / 5, 0, 2, 0.5, 2],
-              [0.9, 0, 0, 0, 1, 0.5, 1],
-            ],
-          },
-          {
-            fork: [
-              [0.5, 0.2, Math.PI / 6, 0, 1, 0, 3],
-              [0.9, 0, 0, 0, 0.7, 0, 1],
-            ],
-          },
-          // leaf node
-          {
-            leaves: [[0.7, 0.3, Math.PI / 3, 0, 8]],
-            flowers: [[0.8, 0.2, Math.PI / 3, 0, 3]],
-          },
-        ],
-      },
-      {
-        name: "红果冬青",
-        path: "resources/images/hongguo/",
-        depth: 3,
-        disturb: 0.05,
-        gravity: 3,
-        shrink: { single: 0.5, multi: 0.4, root: true },
-        tubular_segments: 10,
-        radial_segments: 5,
-        sample_offset: 0.005,
-        leaf: {
-          geometry: { style: "folded", width: 0.3, height: 1 },
-          scale: 0.3,
-          alphaTest: 0.5,
-        },
-        fruit: {
-          geometry: { style: "cross", width: 0.5, height: 1 },
-          scale: 0.15,
-          alphaTest: 0.5,
-        },
-        branches: [
-          // root node
-          {
-            start: new THREE.Vector3(0, 0, 0),
-            end: new THREE.Vector3(0, 3, 0),
-            radius: 0.2,
-            fork: [[0.95, 0, Math.PI / 5, Math.PI / 36, 3, 0.5, 2]],
-          },
-          // middle node
-          {
-            fork: [
-              [0.4, 0.2, Math.PI / 3, 0, 2, 0.5, 6],
-              [0.7, 0.2, Math.PI / 3, 0, 2, 0.5, 4],
-              [0.9, 0, 0, 0, 1, 0.5, 1],
-            ],
-          },
-          {
-            fork: [
-              [0.5, 0.2, Math.PI / 4, 0, 1, 0, 4],
-              [0.9, 0, 0, 0, 0.7, 0, 1],
-            ],
-          },
-          // leaf node
-          {
-            leaves: [[0.7, 0.3, Math.PI / 3, 0, 10]],
-            flowers: [[0.8, 0.2, Math.PI / 3, 0, 3]],
-          },
-        ],
-      },
+      // {
+      //   name: "海棠",
+      //   path: "resources/images/haitang/",
+      //   depth: 3,
+      //   disturb: 0.03,
+      //   gravity: 3,
+      //   shrink: { single: 0.2, multi: 0.35, root: true },
+      //   tubular_segments: 10,
+      //   radial_segments: 4,
+      //   sample_offset: 0.005,
+      //   leaf: {
+      //     geometry: { style: "folded", width: 0.5, height: 1 },
+      //     scale: 0.3,
+      //     alphaTest: 0.5,
+      //   },
+      //   flower: {
+      //     scale: 0.1,
+      //     alphaTest: 0.5,
+      //   },
+      //   branches: [
+      //     // root node
+      //     {
+      //       start: new THREE.Vector3(0, 0, 0),
+      //       end: new THREE.Vector3(0, 10, 0),
+      //       radius: 0.25,
+      //       fork: [
+      //         [0.4, 0.05, Math.PI / 3, 0, 4.5, 0, 6],
+      //         [0.5, 0.1, Math.PI / 4, 0, 4, 0, 4],
+      //         [0.6, 0.1, Math.PI / 5, 0, 2, 0, 4],
+      //         [0.8, 0, 0, 0, 1, 0.5, 1],
+      //       ],
+      //     },
+      //     // middle node
+      //     {
+      //       fork: [
+      //         [0.4, 0.2, Math.PI / 5, 0, 2, 0.5, 3],
+      //         [0.7, 0.2, Math.PI / 5, 0, 2, 0.5, 2],
+      //         [0.9, 0, 0, 0, 1, 0.5, 1],
+      //       ],
+      //     },
+      //     {
+      //       fork: [
+      //         [0.5, 0.2, Math.PI / 6, 0, 1, 0, 3],
+      //         [0.9, 0, 0, 0, 0.7, 0, 1],
+      //       ],
+      //     },
+      //     // leaf node
+      //     {
+      //       leaves: [[0.7, 0.3, Math.PI / 3, 0, 8]],
+      //       flowers: [[0.8, 0.2, Math.PI / 3, 0, 3]],
+      //     },
+      //   ],
+      // },
+      // {
+      //   name: "红果冬青",
+      //   path: "resources/images/hongguo/",
+      //   depth: 3,
+      //   disturb: 0.05,
+      //   gravity: 3,
+      //   shrink: { single: 0.5, multi: 0.4, root: true },
+      //   tubular_segments: 10,
+      //   radial_segments: 5,
+      //   sample_offset: 0.005,
+      //   leaf: {
+      //     geometry: { style: "folded", width: 0.3, height: 1 },
+      //     scale: 0.3,
+      //     alphaTest: 0.5,
+      //   },
+      //   fruit: {
+      //     geometry: { style: "cross", width: 0.5, height: 1 },
+      //     scale: 0.15,
+      //     alphaTest: 0.5,
+      //   },
+      //   branches: [
+      //     // root node
+      //     {
+      //       start: new THREE.Vector3(0, 0, 0),
+      //       end: new THREE.Vector3(0, 3, 0),
+      //       radius: 0.2,
+      //       fork: [[0.95, 0, Math.PI / 5, Math.PI / 36, 3, 0.5, 2]],
+      //     },
+      //     // middle node
+      //     {
+      //       fork: [
+      //         [0.4, 0.2, Math.PI / 3, 0, 2, 0.5, 6],
+      //         [0.7, 0.2, Math.PI / 3, 0, 2, 0.5, 4],
+      //         [0.9, 0, 0, 0, 1, 0.5, 1],
+      //       ],
+      //     },
+      //     {
+      //       fork: [
+      //         [0.5, 0.2, Math.PI / 4, 0, 1, 0, 4],
+      //         [0.9, 0, 0, 0, 0.7, 0, 1],
+      //       ],
+      //     },
+      //     // leaf node
+      //     {
+      //       leaves: [[0.7, 0.3, Math.PI / 3, 0, 10]],
+      //       flowers: [[0.8, 0.2, Math.PI / 3, 0, 3]],
+      //     },
+      //   ],
+      // },
     ];
   }
 
