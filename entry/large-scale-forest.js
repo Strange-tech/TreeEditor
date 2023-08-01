@@ -86,6 +86,8 @@ function main() {
 
   // const axesHelper = new THREE.AxesHelper(1000);
   // scene.add(axesHelper);
+  const terrain = new Terrain(planeSize, planeSize, vertexNumber, vertexNumber);
+  const vertices = terrain.setImprovedNoise(0.3);
 
   const customizeTree = new CustomizeTree();
   const treebuilder = new TreeBuilder();
@@ -128,8 +130,6 @@ function main() {
 
   //-----------------------------------------------------------------------------
   // TERRAIN
-  const terrain = new Terrain(planeSize, planeSize, vertexNumber, vertexNumber);
-  const vertices = terrain.setImprovedNoise(0.3);
   terrain.loadTexture("resources/images/terrain/terrain_base.png");
   csm.setupMaterial(terrain.getMaterial());
   const terrainMesh = terrain.getMesh();
