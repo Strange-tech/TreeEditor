@@ -354,7 +354,7 @@ class TreeBuilder {
     if (treeObj.flower) {
       flowerTexture = loader.load(treeObj.path + "flower_base.png");
       flowerTexture.colorSpace = THREE.SRGBColorSpace;
-      flowerMaterial = new THREE.MeshLambertMaterial({
+      flowerMaterial = new THREE.MeshPhongMaterial({
         map: flowerTexture,
         side: THREE.DoubleSide,
         alphaTest: treeObj.leaf.alphaTest,
@@ -362,7 +362,7 @@ class TreeBuilder {
     }
     leafTexture = loader.load(treeObj.path + "leaf_base.png");
     leafTexture.colorSpace = THREE.SRGBColorSpace;
-    leafMaterial = new THREE.MeshLambertMaterial({
+    leafMaterial = new THREE.MeshPhongMaterial({
       map: leafTexture,
       // map: loader.load(treeObj.path + "leaf_base_standard.png"),
       // normalMap: loader.load(treeObj.path + "leaf_normal_standard.png"),
@@ -444,7 +444,7 @@ class TreeBuilder {
     twigTexture.wrapS = /*treeNormalTexture.wrapS =*/ THREE.RepeatWrapping;
     twigTexture.repeat.set(2, 1);
     // treeNormalTexture.repeat.set(2, 1);
-    const twigMaterial = new THREE.MeshLambertMaterial({
+    const twigMaterial = new THREE.MeshPhongMaterial({
       map: twigTexture,
       // wireframe: true,
       // normalMap: treeNormalTexture,

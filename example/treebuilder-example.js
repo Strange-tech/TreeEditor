@@ -1,5 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { CSM } from "three/examples/jsm/csm/CSM.js";
+import { CSMHelper } from "three/examples/jsm/csm/CSMHelper.js";
 import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
 import { TreeBuilder } from "../TreeBuilder";
 import { getTrees } from "../AxiosApi";
@@ -12,6 +14,23 @@ async function main() {
   const canvas = document.querySelector("#c");
   const renderer = new THREE.WebGLRenderer({ canvas: canvas });
   renderer.shadowMap.enabled = true;
+
+  const params = {
+    orthographic: false,
+    fade: false,
+    far: 1000,
+    mode: "practical",
+    lightX: -1,
+    lightY: -1,
+    lightZ: -1,
+    margin: 100,
+    lightFar: 5000,
+    lightNear: 1,
+    autoUpdateHelper: true,
+    updateHelper: function () {
+      csmHelper.update();
+    },
+  };
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0xcccccc);
@@ -27,33 +46,37 @@ async function main() {
   controls.target.set(0, 10, 0);
   controls.update();
 
-  const amLight = new THREE.AmbientLight(0xffffff, 0.2);
+  const amLight = new THREE.AmbientLight(0xffffff, 0.1);
   scene.add(amLight);
-  const dirlight = new THREE.DirectionalLight(0xffffff, 0.8);
-  dirlight.position.set(5, 15, 5);
-  dirlight.castShadow = true;
-  dirlight.shadow.camera.top = 20;
-  dirlight.shadow.camera.right = 20;
-  dirlight.shadow.camera.bottom = -20;
-  dirlight.shadow.camera.left = -20;
-  dirlight.shadow.camera.near = 1;
-  dirlight.shadow.camera.far = 100;
-  scene.add(dirlight);
+
+  const csm = new CSM({
+    maxFar: params.far,
+    cascades: 4,
+    mode: params.mode,
+    parent: scene,
+    shadowMapSize: 2048,
+    lightDirection: new THREE.Vector3(
+      params.lightX,
+      params.lightY,
+      params.lightZ
+    ).normalize(),
+    lightColor: new THREE.Color(0x000020),
+    lightIntensity: 0.2,
+    camera: camera,
+  });
 
   const axesHelper = new THREE.AxesHelper(5);
   scene.add(axesHelper);
 
-  const planeSize = 20;
+  const planeSize = 50;
   const plainGeometry = new THREE.PlaneGeometry(planeSize, planeSize, 10, 10);
   plainGeometry.rotateX(-Math.PI / 2);
-  const plain = new THREE.Mesh(
-    plainGeometry,
-    new THREE.MeshLambertMaterial({
-      // color: "white",
-      side: THREE.DoubleSide,
-    })
-  );
-  // plain.castShadow = true;
+  const planeMaterial = new THREE.MeshPhongMaterial({
+    color: "white",
+    side: THREE.DoubleSide,
+  });
+  const plain = new THREE.Mesh(plainGeometry, planeMaterial);
+  csm.setupMaterial(planeMaterial);
   plain.receiveShadow = true;
   scene.add(plain);
 
@@ -123,7 +146,7 @@ async function main() {
     });
     lod1 = new THREE.Mesh(geometry, material);
     lod1.position.set(20, 0, 0);
-    console.log(geometry);
+    lod1.castShadow = true;
     scene.add(lod1);
   }
 
@@ -194,6 +217,7 @@ async function main() {
       camera.aspect = canvas.clientWidth / canvas.clientHeight;
       camera.updateProjectionMatrix();
     }
+    csm.update();
     renderer.render(scene, camera);
   }
 

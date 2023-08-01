@@ -1,101 +1,101 @@
 import * as THREE from "three";
 import { MapControls } from "three/examples/jsm/controls/MapControls.js";
+import { CSM } from "three/examples/jsm/csm/CSM.js";
+import { CSMHelper } from "three/examples/jsm/csm/CSMHelper.js";
 import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
 import { TreeBuilder } from "../TreeBuilder";
 import { getTrees } from "../AxiosApi";
 import { CustomizeTree } from "../CustomizeTree";
-import { drawLine, lookAt } from "../utilities";
 import { InstancedLOD } from "../lib/InstancedLOD";
 import { LeafGeometry } from "../leaf_flower_fruit/LeafGeometry";
 import { Terrain } from "../lib/Terrain";
 
-function 原神启动(treebuilder, treeObj, dist0, dist1, scale, textureLoader) {
-  treebuilder.clearMesh();
-  treebuilder.init(treeObj);
-  let lod0 = treebuilder.buildTree(treebuilder.buildSkeleton());
-
-  let texture = textureLoader.load(`${treeObj.path}texture.png`);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  let geometry = new LeafGeometry("cross", scale, scale).generate();
-  let material = new THREE.MeshBasicMaterial({
-    map: texture,
-    side: THREE.DoubleSide,
-    alphaTest: 0.5,
-  });
-  let lod1 = new THREE.Mesh(geometry, material);
-
-  let details = [
-    {
-      group: lod0,
-      level: "l0",
-      distance: dist0,
-    },
-    {
-      group: new THREE.Group().add(lod1),
-      level: "l1",
-      distance: dist1,
-    },
-  ];
-  return details;
-}
-
 function main() {
   const canvas = document.querySelector("#c");
   const renderer = new THREE.WebGLRenderer({ canvas: canvas });
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xffffff);
 
   const fov = 45;
   const aspect = 2;
   const near = 0.1;
-  const far = 100000;
+  const far = 10000;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  camera.position.set(1000, 1000, 1000);
+  camera.position.set(100, 70, 0);
   camera.up.set(0, 1, 0);
 
   const controls = new MapControls(camera, renderer.domElement);
-  controls.enableDamping = true;
+  // controls.enableDamping = true;
 
-  const color = 0xffffff;
-  const intensity = 1.0;
-  const amLight = new THREE.AmbientLight(color, intensity);
+  const amLight = new THREE.AmbientLight(0xffffff, 0.1);
   scene.add(amLight);
 
-  const planeSize = 10000;
-  const vertexNumber = 1000;
+  const csm = new CSM({
+    maxFar: 500,
+    cascades: 3,
+    mode: "practical",
+    parent: scene,
+    shadowMapSize: 1024,
+    lightDirection: new THREE.Vector3(-1, -1, -1).normalize(),
+    lightColor: new THREE.Color(0x000020),
+    lightIntensity: 0.3,
+    camera: camera,
+  });
+
+  const textureLoader = new THREE.TextureLoader();
+
+  function 原神启动(treebuilder, treeObj, dist0, dist1) {
+    treebuilder.clearMesh();
+    treebuilder.init(treeObj);
+    let lod0 = treebuilder.buildTree(treebuilder.buildSkeleton());
+    let texture = textureLoader.load(`${treeObj.path}texture.png`);
+    let box = new THREE.Box3().setFromObject(lod0);
+    let boxSize = box.getSize(new THREE.Vector3());
+    let size = Math.max(...boxSize.toArray());
+
+    let geometry = new LeafGeometry("cross", 1, 1)
+      .generate()
+      .scale(size, size, size);
+    let material = new THREE.MeshLambertMaterial({
+      map: texture,
+      side: THREE.DoubleSide,
+      // transparent: true,
+      alphaTest: 0.5,
+    });
+    let lod1 = new THREE.Mesh(geometry, material);
+
+    let details = [
+      {
+        group: lod0,
+        level: "l0",
+        distance: dist0,
+      },
+      {
+        group: new THREE.Group().add(lod1),
+        level: "l1",
+        distance: dist1,
+      },
+    ];
+    return details;
+  }
+
+  const planeSize = 5000;
+  const vertexNumber = 500;
 
   // const axesHelper = new THREE.AxesHelper(1000);
   // scene.add(axesHelper);
 
-  const terrain = new Terrain(
-    scene,
-    planeSize,
-    planeSize,
-    vertexNumber,
-    vertexNumber
-  );
-  const vertices = terrain.setImprovedNoise(1);
-  terrain.loadTexture("resources/images/terrain.png");
-  terrain.addToScene();
-
   const customizeTree = new CustomizeTree();
   const treebuilder = new TreeBuilder();
-  const textureLoader = new THREE.TextureLoader();
+
   const instancedLODs = [];
-  let scales = [27, 14, 27, 6, 10, 10, 10, 10, 8, 10];
   let l = vertices.array.length / 3;
-  customizeTree.content.forEach((treeObj, index) => {
-    let details = 原神启动(
-      treebuilder,
-      treeObj,
-      900,
-      2000,
-      scales[index],
-      textureLoader
-    );
+  customizeTree.content.forEach((treeObj) => {
+    let details = 原神启动(treebuilder, treeObj, 300, 2000);
     let instancedlod = new InstancedLOD(scene, camera, treeObj.name);
-    let total = 10000;
+    let total = 5000;
     instancedlod.setLevels(details);
     instancedlod.setPopulation(total);
     for (let i = 0; i < total; i++) {
@@ -111,11 +111,42 @@ function main() {
     instancedLODs.push(instancedlod);
   });
 
+  //-----------------------------------------------------------------------------
+  // SKY BOX
+  {
+    const skyboxLoader = new THREE.CubeTextureLoader();
+    const skyboxTexture = skyboxLoader.load([
+      "resources/images/sky box/right.jpg",
+      "resources/images/sky box/left.jpg",
+      "resources/images/sky box/top.jpg",
+      "resources/images/sky box/bottom.jpg",
+      "resources/images/sky box/front.jpg",
+      "resources/images/sky box/back.jpg",
+    ]);
+    scene.background = skyboxTexture;
+  }
+
+  //-----------------------------------------------------------------------------
+  // TERRAIN
+  const terrain = new Terrain(planeSize, planeSize, vertexNumber, vertexNumber);
+  const vertices = terrain.setImprovedNoise(0.3);
+  terrain.loadTexture("resources/images/terrain/terrain_base.png");
+  csm.setupMaterial(terrain.getMaterial());
+  const terrainMesh = terrain.getMesh();
+  terrainMesh.castShadow = true;
+  terrainMesh.receiveShadow = true;
+  scene.add(terrainMesh);
+
+  //-----------------------------------------------------------------------------
+  // GRASS
+
   function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;
     const pixelRatio = window.devicePixelRatio;
     const width = (canvas.clientWidth * pixelRatio) | 0;
     const height = (canvas.clientHeight * pixelRatio) | 0;
+    // const width = canvas.clientWidth | 0;
+    // const height = canvas.clientHeight | 0;
     const needResize = canvas.width !== width || canvas.height !== height;
     if (needResize) {
       renderer.setSize(width, height, false);
@@ -130,10 +161,11 @@ function main() {
       camera.aspect = canvas.clientWidth / canvas.clientHeight;
       camera.updateProjectionMatrix();
     }
-    controls.update();
+    // controls.update();
     instancedLODs.forEach((instance) => {
       instance.render();
     });
+    csm.update();
     renderer.render(scene, camera);
   }
 

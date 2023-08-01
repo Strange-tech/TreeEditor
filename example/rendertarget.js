@@ -130,18 +130,18 @@ async function main() {
     丁香: function () {
       buildtree(species[8]);
     },
-    香樟: function () {
+    // 香樟: function () {
+    //   buildtree(species[9]);
+    // },
+    凤凰木: function () {
       buildtree(species[9]);
     },
-    凤凰木: function () {
-      buildtree(species[10]);
-    },
-    海棠: function () {
-      buildtree(species[11]);
-    },
-    红果冬青: function () {
-      buildtree(species[12]);
-    },
+    // 海棠: function () {
+    //   buildtree(species[11]);
+    // },
+    // 红果冬青: function () {
+    //   buildtree(species[12]);
+    // },
   };
   const gui = new GUI();
   const tree_selector = gui.addFolder("tree");

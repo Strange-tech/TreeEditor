@@ -82,7 +82,7 @@ class CustomizeTree {
         leaf: {
           geometry: { style: "cross", width: 1, height: 1 },
           scale: 0.8,
-          alphaTest: 0.5,
+          alphaTest: 0.2,
         },
         branches: [
           // root node
@@ -216,7 +216,7 @@ class CustomizeTree {
         leaf: {
           geometry: { style: "folded", width: 0.5, height: 1 },
           scale: 0.2,
-          alphaTest: 0.5,
+          alphaTest: 0.2,
         },
         flower: {
           scale: 0.08,
@@ -269,7 +269,7 @@ class CustomizeTree {
         leaf: {
           geometry: { style: "folded", width: 1, height: 1 },
           scale: 0.4,
-          alphaTest: 0.5,
+          alphaTest: 0.2,
         },
         branches: [
           // root node
@@ -317,7 +317,7 @@ class CustomizeTree {
         leaf: {
           geometry: { style: "folded", width: 0.5, height: 1 },
           scale: 0.2,
-          alphaTest: 0.5,
+          alphaTest: 0.2,
         },
         flower: {
           scale: 0.08,
@@ -370,7 +370,7 @@ class CustomizeTree {
         leaf: {
           geometry: { style: "folded", width: 0.5, height: 1 },
           scale: 0.2,
-          alphaTest: 0.5,
+          alphaTest: 0.2,
         },
         flower: {
           scale: 0.08,
@@ -423,7 +423,7 @@ class CustomizeTree {
         leaf: {
           geometry: { style: "folded", width: 0.5, height: 1 },
           scale: 0.2,
-          alphaTest: 0.5,
+          alphaTest: 0.2,
         },
         flower: {
           scale: 0.07,
@@ -470,7 +470,7 @@ class CustomizeTree {
         leaf: {
           geometry: { style: "folded_reverse", width: 1, height: 1 },
           scale: 0.3,
-          alphaTest: 0.5,
+          alphaTest: 0.2,
         },
         flower: {
           scale: 0.15,

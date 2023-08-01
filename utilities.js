@@ -104,6 +104,62 @@ const lookAt = (obj, camera, controls) => {
   controls.update();
 };
 
+const makeImposterTexture = (textureSize, obj) => {
+  const frameArea = (sizeToFitOnScreen, boxSize, boxCenter, camera) => {
+    const halfSizeToFitOnScreen = sizeToFitOnScreen * 0.5;
+    const halfFovY = THREE.MathUtils.degToRad(camera.fov * 0.5);
+    const distance = halfSizeToFitOnScreen / Math.tan(halfFovY);
+
+    camera.position.copy(boxCenter);
+    camera.position.z += distance;
+
+    // pick some near and far values for the frustum that
+    // will contain the box.
+    camera.near = boxSize / 100;
+    camera.far = boxSize * 100;
+
+    camera.updateProjectionMatrix();
+  };
+  const scene = new THREE.Scene();
+  const renderer = new THREE.WebGLRenderer();
+  const rt = new THREE.WebGLRenderTarget(textureSize, textureSize);
+
+  const aspect = 1; // because the render target is square
+  const fov = 75;
+  const near = 0.1;
+  const far = 1000;
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+  scene.add(ambientLight);
+  scene.add(obj);
+
+  // compute the box that contains obj
+  const box = new THREE.Box3().setFromObject(obj);
+
+  const boxSize = box.getSize(new THREE.Vector3());
+  const boxCenter = box.getCenter(new THREE.Vector3());
+
+  // set the camera to frame the box
+  const fudge = 1.1;
+  const size = Math.max(...boxSize.toArray()) * fudge;
+  frameArea(size, size, boxCenter, camera);
+
+  renderer.autoClear = false;
+  renderer.setRenderTarget(rt);
+  renderer.render(scene, camera);
+  renderer.setRenderTarget(null);
+  renderer.autoClear = true;
+
+  scene.remove(obj);
+
+  return {
+    offset: boxCenter.multiplyScalar(fudge),
+    size: size,
+    texture: rt.texture,
+  };
+};
+
 export {
   randomRangeLinear,
   disturbedCurveNode,
@@ -112,4 +168,5 @@ export {
   drawLine,
   lookAt,
   toSeePoint,
+  makeImposterTexture,
 };
