@@ -40,7 +40,7 @@ function main() {
     shadowMapSize: 1024,
     lightDirection: new THREE.Vector3(-1, -1, -1).normalize(),
     lightColor: new THREE.Color(0x000020),
-    lightIntensity: 0.1,
+    lightIntensity: 0.5,
     camera: camera,
   });
 
@@ -58,9 +58,10 @@ function main() {
     let geometry = new LeafGeometry("cross", 1, 1)
       .generate()
       .scale(size, size, size);
-    let material = new THREE.MeshLambertMaterial({
+    let material = new THREE.MeshBasicMaterial({
       map: texture,
       side: THREE.DoubleSide,
+      color: 0xb8b8b8,
       // transparent: true,
       alphaTest: 0.5,
     });
@@ -94,10 +95,12 @@ function main() {
 
   const instancedLODs = [];
   let l = vertices.array.length / 3;
-  customizeTree.content.forEach((treeObj) => {
-    let details = 原神启动(treebuilder, treeObj, 400, 2000);
+  customizeTree.content.forEach((treeObj, index) => {
+    let details = 原神启动(treebuilder, treeObj, 300, 2000);
     let instancedlod = new InstancedLOD(scene, camera, treeObj.name);
     let total = 10000;
+    if (index === 0) total = 15000;
+    else if (index === 2) total = 5000;
     instancedlod.setLevels(details);
     instancedlod.setPopulation(total);
     for (let i = 0; i < total; i++) {
