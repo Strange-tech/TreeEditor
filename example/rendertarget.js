@@ -11,7 +11,7 @@ async function main() {
   renderer.shadowMap.enabled = true;
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xffffff);
+  // scene.background = new THREE.Color(0xffffff);
 
   const fov = 45;
   const aspect = 2;
@@ -24,9 +24,9 @@ async function main() {
   controls.target.set(0, 10, 0);
   controls.update();
 
-  const amLight = new THREE.AmbientLight(0xffffff, 0.2);
+  const amLight = new THREE.AmbientLight(0xffffff, 0.1);
   scene.add(amLight);
-  const dirlight = new THREE.DirectionalLight(0xffffff, 0.8);
+  const dirlight = new THREE.DirectionalLight(0xffffff, 0.5);
   dirlight.position.set(5, 15, 5);
   dirlight.castShadow = true;
   dirlight.shadow.camera.top = 20;
@@ -75,13 +75,14 @@ async function main() {
   };
 
   const customizeTree = new CustomizeTree();
-  let treeObj = customizeTree.getTree("海棠");
+  let treeObj = customizeTree.getTree("凤凰木");
 
   builder.init(treeObj, true, "y-axis");
   let skeleton = builder.buildSkeleton();
   let singleTree = builder.buildTree(skeleton);
   singleTree.children.forEach((child) => {
     child.castShadow = true;
+    child.receiveShadow = true;
   });
   scene.add(singleTree);
   lookAt(singleTree, camera, controls);

@@ -1,16 +1,23 @@
 import * as THREE from "three";
+// import WebGPU from "three/examples/jsm/capabilities/WebGPU.js";
+// import WebGPURenderer from "three/examples/jsm/renderers/webgpu/WebGPURenderer.js";
 import { MapControls } from "three/examples/jsm/controls/MapControls.js";
 import { CSM } from "three/examples/jsm/csm/CSM.js";
 import { CSMHelper } from "three/examples/jsm/csm/CSMHelper.js";
 import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
 import { TreeBuilder } from "../TreeBuilder";
-import { getTrees } from "../AxiosApi";
 import { CustomizeTree } from "../CustomizeTree";
 import { InstancedLOD } from "../lib/InstancedLOD";
 import { LeafGeometry } from "../leaf_flower_fruit/LeafGeometry";
 import { Terrain } from "../lib/Terrain";
+import { QuadTree, Rectangle, Point } from "../lib/Quadtree";
+import { GUIController } from "../lib/GUIController";
 
 function main() {
+  // if (WebGPU.isAvailable() === false) {
+  //   document.body.appendChild(WebGPU.getErrorMessage());
+  //   throw new Error("No WebGPU support");
+  // }
   const canvas = document.querySelector("#c");
   const renderer = new THREE.WebGLRenderer({ canvas: canvas });
   renderer.shadowMap.enabled = true;
@@ -29,6 +36,8 @@ function main() {
   const controls = new MapControls(camera, renderer.domElement);
   // controls.enableDamping = true;
 
+  const guiController = new GUIController(camera, controls);
+
   const amLight = new THREE.AmbientLight(0xffffff, 0.1);
   scene.add(amLight);
 
@@ -37,7 +46,7 @@ function main() {
     cascades: 3,
     mode: "practical",
     parent: scene,
-    shadowMapSize: 1024,
+    shadowMapSize: 256,
     lightDirection: new THREE.Vector3(-1, -1, -1).normalize(),
     lightColor: new THREE.Color(0x000020),
     lightIntensity: 0.5,
@@ -61,9 +70,9 @@ function main() {
     let material = new THREE.MeshBasicMaterial({
       map: texture,
       side: THREE.DoubleSide,
-      color: 0xb8b8b8,
+      color: 0xcdcdcd,
       // transparent: true,
-      alphaTest: 0.5,
+      alphaTest: 0.9,
     });
     let lod1 = new THREE.Mesh(geometry, material);
 
@@ -95,6 +104,16 @@ function main() {
 
   const instancedLODs = [];
   let l = vertices.array.length / 3;
+  const y_axis = new THREE.Vector3(0, 1, 0);
+  let position = new THREE.Vector3();
+  let quaterion = new THREE.Quaternion();
+  let scale = new THREE.Vector3();
+  let idx_x, size;
+
+  const boundary = new Rectangle(0, 0, planeSize / 2, planeSize / 2);
+  const quadtree = new QuadTree(boundary, 10);
+  const r = 5;
+
   customizeTree.content.forEach((treeObj, index) => {
     let details = 原神启动(treebuilder, treeObj, 300, 2000);
     let instancedlod = new InstancedLOD(scene, camera, treeObj.name);
@@ -103,15 +122,34 @@ function main() {
     else if (index === 2) total = 5000;
     instancedlod.setLevels(details);
     instancedlod.setPopulation(total);
-    for (let i = 0; i < total; i++) {
-      let idx_x = 3 * Math.floor(Math.random() * l);
+    let cnt = 0;
+    while (cnt < total) {
+      let found;
+      do {
+        found = [];
+        idx_x = 3 * Math.floor(Math.random() * l);
+        let range = new Rectangle(
+          vertices.array[idx_x], // x
+          vertices.array[idx_x + 2], // z
+          r,
+          r
+        );
+        quadtree.query(range, found);
+        console.log("query");
+      } while (found.length > 0);
       let x = vertices.array[idx_x],
         y = vertices.array[idx_x + 1],
         z = vertices.array[idx_x + 2];
+      quadtree.insert(new Point(x, z, r));
+      size = Math.random() + 0.5;
+      position.set(x, y, z);
+      quaterion.setFromAxisAngle(y_axis, Math.random() * Math.PI * 2);
+      scale.set(size, size, size);
       instancedlod.setTransform(
-        i,
-        new THREE.Matrix4().makeTranslation(x, y, z)
+        cnt,
+        new THREE.Matrix4().compose(position, quaterion, scale)
       );
+      cnt++;
     }
     instancedLODs.push(instancedlod);
   });
@@ -133,7 +171,10 @@ function main() {
 
   //-----------------------------------------------------------------------------
   // TERRAIN
-  terrain.loadTexture("resources/images/terrain/terrain_base.png");
+  terrain.loadTexture(
+    "resources/images/terrain/terrain_base.png",
+    "resources/images/terrain/terrain_normal.png"
+  );
   csm.setupMaterial(terrain.getMaterial());
   const terrainMesh = terrain.getMesh();
   terrainMesh.castShadow = true;
@@ -142,6 +183,15 @@ function main() {
 
   //-----------------------------------------------------------------------------
   // GRASS
+
+  //-----------------------------------------------------------------------------
+  // WANDERER
+  const points = [
+    new THREE.Vector3(1800, 800, 0),
+    new THREE.Vector3(1000, 300, 0),
+    new THREE.Vector3(-400, 70, 0),
+    new THREE.Vector3(-800, 70, 0),
+  ];
 
   function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;
@@ -176,7 +226,21 @@ function main() {
     requestAnimationFrame(animate);
     render();
   }
-  animate();
+  // animate();
+
+  function renderForWander() {
+    guiController.moveCamera();
+    render();
+    let id = requestAnimationFrame(renderForWander);
+    if (guiController.reachWanderEnd()) {
+      cancelAnimationFrame(id);
+      // controls.update();
+      animate();
+    }
+  }
+
+  guiController.setWander(points, 1500, 1400);
+  renderForWander();
 }
 
 main();
