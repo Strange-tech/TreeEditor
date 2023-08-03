@@ -10,7 +10,7 @@ import { CustomizeTree } from "../CustomizeTree";
 import { InstancedLOD } from "../lib/InstancedLOD";
 import { LeafGeometry } from "../leaf_flower_fruit/LeafGeometry";
 import { Terrain } from "../lib/Terrain";
-import { QuadTree, Rectangle, Point } from "../lib/Quadtree";
+import { Octree } from "../lib/Octree";
 import { GUIController } from "../lib/GUIController";
 
 function main() {
@@ -28,7 +28,7 @@ function main() {
   const fov = 45;
   const aspect = 2;
   const near = 0.1;
-  const far = 10000;
+  const far = 5000;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
   camera.position.set(100, 70, 0);
   camera.up.set(0, 1, 0);
@@ -91,8 +91,8 @@ function main() {
     return details;
   }
 
-  const planeSize = 5000;
-  const vertexNumber = 500;
+  const planeSize = 20000;
+  const vertexNumber = 1500;
 
   // const axesHelper = new THREE.AxesHelper(1000);
   // scene.add(axesHelper);
@@ -110,45 +110,53 @@ function main() {
   let scale = new THREE.Vector3();
   let idx_x, size;
 
-  const boundary = new Rectangle(0, 0, planeSize / 2, planeSize / 2);
-  const quadtree = new QuadTree(boundary, 10);
-  const r = 5;
+  const boundary = terrain.getBoundingBox();
+  // const range_box_size = 3;
 
   customizeTree.content.forEach((treeObj, index) => {
     let details = 原神启动(treebuilder, treeObj, 300, 2000);
     let instancedlod = new InstancedLOD(scene, camera, treeObj.name);
-    let total = 10000;
-    if (index === 0) total = 15000;
-    else if (index === 2) total = 5000;
+    let octree = new Octree(boundary, 10, 0);
+    instancedlod.setOctree(octree);
+    let total = 100000;
+    if (index === 0) total = 150000;
+    else if (index === 2) total = 50000;
     instancedlod.setLevels(details);
     instancedlod.setPopulation(total);
     let cnt = 0;
+    // let range = new THREE.Box3();
     while (cnt < total) {
-      let found;
-      do {
-        found = [];
-        idx_x = 3 * Math.floor(Math.random() * l);
-        let range = new Rectangle(
-          vertices.array[idx_x], // x
-          vertices.array[idx_x + 2], // z
-          r,
-          r
-        );
-        quadtree.query(range, found);
-        console.log("query");
-      } while (found.length > 0);
-      let x = vertices.array[idx_x],
-        y = vertices.array[idx_x + 1],
-        z = vertices.array[idx_x + 2];
-      quadtree.insert(new Point(x, z, r));
+      // let found;
+      let x, y, z;
+      idx_x = 3 * Math.floor(Math.random() * l);
+      x = vertices.array[idx_x];
+      y = vertices.array[idx_x + 1];
+      z = vertices.array[idx_x + 2];
+      // do {
+      //   found = [];
+      //   idx_x = 3 * Math.floor(Math.random() * l);
+      //   x = vertices.array[idx_x];
+      //   y = vertices.array[idx_x + 1];
+      //   z = vertices.array[idx_x + 2];
+      //   range.min.set(
+      //     x - range_box_size,
+      //     y - range_box_size,
+      //     z - range_box_size
+      //   );
+      //   range.max.set(
+      //     x + range_box_size,
+      //     y + range_box_size,
+      //     z + range_box_size
+      //   );
+      //   octree.queryByBox(range, found);
+      //   console.log("query");
+      // } while (found.length > 0);
+
       size = Math.random() + 0.5;
+      scale.set(size, size, size);
       position.set(x, y, z);
       quaterion.setFromAxisAngle(y_axis, Math.random() * Math.PI * 2);
-      scale.set(size, size, size);
-      instancedlod.setTransform(
-        cnt,
-        new THREE.Matrix4().compose(position, quaterion, scale)
-      );
+      octree.insert(new THREE.Matrix4().compose(position, quaterion, scale));
       cnt++;
     }
     instancedLODs.push(instancedlod);
@@ -175,7 +183,7 @@ function main() {
     "resources/images/terrain/terrain_base.png",
     "resources/images/terrain/terrain_normal.png"
   );
-  csm.setupMaterial(terrain.getMaterial());
+  csm.setupMaterial(terrain.planeMaterial);
   const terrainMesh = terrain.getMesh();
   terrainMesh.castShadow = true;
   terrainMesh.receiveShadow = true;
