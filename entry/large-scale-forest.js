@@ -30,13 +30,14 @@ function main() {
   const near = 0.1;
   const far = 5000;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  camera.position.set(100, 70, 0);
-  camera.up.set(0, 1, 0);
+  camera.position.set(1000, 1000, 0);
 
   const controls = new MapControls(camera, renderer.domElement);
+  controls.minDistance = 100;
+  controls.maxDistance = 3000;
   // controls.enableDamping = true;
 
-  const guiController = new GUIController(camera, controls);
+  const guiController = new GUIController(camera);
 
   const amLight = new THREE.AmbientLight(0xffffff, 0.1);
   scene.add(amLight);
@@ -91,7 +92,7 @@ function main() {
     return details;
   }
 
-  const planeSize = 20000;
+  const planeSize = 15000;
   const vertexNumber = 1500;
 
   // const axesHelper = new THREE.AxesHelper(1000);
@@ -194,12 +195,14 @@ function main() {
 
   //-----------------------------------------------------------------------------
   // WANDERER
-  const points = [
-    new THREE.Vector3(1800, 800, 0),
-    new THREE.Vector3(1000, 300, 0),
-    new THREE.Vector3(-400, 70, 0),
-    new THREE.Vector3(-800, 70, 0),
+  const keypoints = [
+    new THREE.Vector3(1000, 1000, 0),
+    new THREE.Vector3(1000, 200, 0),
+    new THREE.Vector3(400, 200, 0),
   ];
+  const curve = new THREE.CatmullRomCurve3(keypoints);
+  const points = curve.getPoints(500);
+  let cnt = 0;
 
   function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;
@@ -222,7 +225,8 @@ function main() {
       camera.aspect = canvas.clientWidth / canvas.clientHeight;
       camera.updateProjectionMatrix();
     }
-    // controls.update();
+    if (cnt < points.length) camera.position.copy(points[cnt++]);
+    controls.update();
     instancedLODs.forEach((instance) => {
       instance.render();
     });
@@ -234,21 +238,21 @@ function main() {
     requestAnimationFrame(animate);
     render();
   }
-  // animate();
+  animate();
 
-  function renderForWander() {
-    guiController.moveCamera();
-    render();
-    let id = requestAnimationFrame(renderForWander);
-    if (guiController.reachWanderEnd()) {
-      cancelAnimationFrame(id);
-      // controls.update();
-      animate();
-    }
-  }
+  // function renderForWander() {
+  //   guiController.moveCamera();
+  //   render();
+  //   let id = requestAnimationFrame(renderForWander);
+  //   if (guiController.reachWanderEnd()) {
+  //     cancelAnimationFrame(id);
+  //     camera.lookAt(0, 0, -100);
+  //     animate();
+  //   }
+  // }
 
-  guiController.setWander(points, 1500, 1400);
-  renderForWander();
+  // guiController.setWander(points, 500, 490);
+  // renderForWander();
 }
 
 main();
