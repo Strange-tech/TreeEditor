@@ -34,10 +34,9 @@ class TreeBuilder {
       this.leaf_matrices = [];
       this.flower_matrices = [];
     }
-    if (verticalAxis === "y-axis")
-      this.verticalAxis = new THREE.Vector3(0, 1, 0);
-    else if (verticalAxis === "z-axis")
-      this.verticalAxis = new THREE.Vector3(0, 0, 1);
+    this.X = new THREE.Vector3(1, 0, 0);
+    this.Y = new THREE.Vector3(0, 1, 0);
+    this.Z = new THREE.Vector3(0, 0, 1);
   }
 
   init(treeObj, mergeLeaves = true, verticalAxis = "y-axis") {
@@ -77,7 +76,10 @@ class TreeBuilder {
   ) {
     const matrices = [];
     let pointsLength = points.length;
-    let dir;
+    let rot1 = new THREE.Matrix4().makeRotationAxis(
+      this.X,
+      Math.PI / 2 + randomRangeLinear(-0.3, 0.3)
+    );
     for (let i = 1; i <= number; i++) {
       let base = Math.floor(
         pointsLength *
@@ -85,38 +87,22 @@ class TreeBuilder {
       );
       let position = points[base];
       let tangent = curve.getTangent(base / pointsLength);
-      let orthogonal = new THREE.Vector3(
-        0,
-        1,
-        -tangent.y / tangent.z
-      ).normalize();
-      if (i === 1) {
-        dir = new THREE.Vector3()
-          .copy(tangent)
-          .applyAxisAngle(
-            orthogonal,
-            base_angle + randomRangeLinear(-angle_noise, angle_noise)
-          )
-          .applyAxisAngle(tangent, (Math.random() * Math.PI) / 2)
-          .normalize();
-      } else {
-        dir.applyAxisAngle(tangent, (2 * Math.PI) / number).normalize();
-      }
-      let rot_angle = this.verticalAxis.angleTo(dir);
-      let rot_axis = new THREE.Vector3()
-        .crossVectors(this.verticalAxis, dir)
-        .normalize();
-
+      base_angle = -base_angle;
+      let tangent_xoz = tangent
+        .clone()
+        .setY(0)
+        .applyAxisAngle(
+          this.Y,
+          base_angle + randomRangeLinear(-angle_noise, angle_noise)
+        );
+      let rot_angle = this.Z.angleTo(tangent_xoz);
+      if (tangent_xoz.x < 0) rot_angle = -rot_angle;
+      let rot2 = new THREE.Matrix4().makeRotationAxis(this.Y, rot_angle);
       let trans = new THREE.Matrix4().makeTranslation(
         position.x,
         position.y,
         position.z
       );
-      let rot1 = new THREE.Matrix4().makeRotationAxis(
-          this.verticalAxis,
-          Math.random() * 2 * Math.PI
-        ), // (0,2pi)
-        rot2 = new THREE.Matrix4().makeRotationAxis(rot_axis, rot_angle);
       let rot = new THREE.Matrix4().multiply(rot2).multiply(rot1);
       let matrix = new THREE.Matrix4().multiply(trans).multiply(rot);
       matrices.push(matrix);
@@ -124,12 +110,70 @@ class TreeBuilder {
     return matrices;
   }
 
+  // randomMatrices(
+  //   curve,
+  //   points,
+  //   base_position,
+  //   position_noise,
+  //   base_angle,
+  //   angle_noise,
+  //   number
+  // ) {
+  //   const matrices = [];
+  //   let pointsLength = points.length;
+  //   let dir;
+  //   for (let i = 1; i <= number; i++) {
+  //     let base = Math.floor(
+  //       pointsLength *
+  //         (base_position + randomRangeLinear(-position_noise, position_noise))
+  //     );
+  //     let position = points[base];
+  //     let tangent = curve.getTangent(base / pointsLength);
+  //     let orthogonal = new THREE.Vector3(
+  //       0,
+  //       1,
+  //       -tangent.y / tangent.z
+  //     ).normalize();
+  //     if (i === 1) {
+  //       dir = new THREE.Vector3()
+  //         .copy(tangent)
+  //         .applyAxisAngle(
+  //           orthogonal,
+  //           base_angle + randomRangeLinear(-angle_noise, angle_noise)
+  //         )
+  //         .applyAxisAngle(tangent, (Math.random() * Math.PI) / 2)
+  //         .normalize();
+  //     } else {
+  //       dir.applyAxisAngle(tangent, (2 * Math.PI) / number).normalize();
+  //     }
+  //     let rot_angle = this.verticalAxis.angleTo(dir);
+  //     let rot_axis = new THREE.Vector3()
+  //       .crossVectors(this.verticalAxis, dir)
+  //       .normalize();
+
+  //     let trans = new THREE.Matrix4().makeTranslation(
+  //       position.x,
+  //       position.y,
+  //       position.z
+  //     );
+  //     let rot1 = new THREE.Matrix4().makeRotationAxis(
+  //         this.verticalAxis,
+  //         Math.random() * 2 * Math.PI
+  //       ), // (0,2pi)
+  //       rot2 = new THREE.Matrix4().makeRotationAxis(rot_axis, rot_angle);
+  //     let rot = new THREE.Matrix4().multiply(rot2).multiply(rot1);
+  //     let matrix = new THREE.Matrix4().multiply(trans).multiply(rot);
+  //     matrices.push(matrix);
+  //   }
+  //   return matrices;
+  // }
+
   buildSkeletonRec(start, end, fatherSkeleton, depth = 0) {
     if (depth > this.treeObj.depth) return;
 
     // let disturb = depth === this.treeObj.depth ? 0 : this.treeObj.disturb;
-    let disturb = this.treeObj.disturb;
-    let gravity = this.treeObj.gravity;
+    let disturb = depth === 0 ? 0 : this.treeObj.disturb;
+    let gravity = depth === 0 ? 0 : this.treeObj.gravity;
     const nodes = disturbedCurveNode(
       makeVector3(start),
       makeVector3(end),
@@ -146,37 +190,42 @@ class TreeBuilder {
       next_node = this.treeObj.branches[depth + 1];
     if (!next_node) return;
 
-    const fork = cur_node.fork;
+    const sub_branches = cur_node.sub_branches;
     let dir, tangent;
-    for (let i = 0; i < fork.length; i++) {
-      for (let j = 1; j <= fork[i][6]; j++) {
+    for (let i = 0; i < sub_branches.length; i++) {
+      for (let j = 1; j <= sub_branches[i][6]; j++) {
         let base = Math.floor(
           pointsLength *
-            (fork[i][0] + randomRangeLinear(-fork[i][1], fork[i][1]))
+            (sub_branches[i][0] +
+              randomRangeLinear(-sub_branches[i][1], sub_branches[i][1]))
         );
         let s = points[base];
         if (j === 1) {
           tangent = curve.getTangent(base / pointsLength);
           let orthogonal = new THREE.Vector3(
             0,
-            1,
-            -tangent.y / tangent.z
+            -tangent.z / tangent.y,
+            1
           ).normalize();
           dir = new THREE.Vector3()
             .copy(tangent)
             .applyAxisAngle(
               orthogonal,
-              fork[i][2] + randomRangeLinear(-fork[i][3], fork[i][3])
+              sub_branches[i][2] +
+                randomRangeLinear(-sub_branches[i][3], sub_branches[i][3])
             )
             .applyAxisAngle(tangent, (Math.random() * Math.PI) / 2)
             .normalize();
         } else {
-          dir.applyAxisAngle(tangent, (2 * Math.PI) / fork[i][6]).normalize();
+          dir
+            .applyAxisAngle(tangent, (2 * Math.PI) / sub_branches[i][6])
+            .normalize();
         }
         let e = new THREE.Vector3().addVectors(
           s,
           dir.multiplyScalar(
-            fork[i][4] + randomRangeLinear(-fork[i][5], fork[i][5])
+            sub_branches[i][4] +
+              randomRangeLinear(-sub_branches[i][5], sub_branches[i][5])
           )
         );
         this.buildSkeletonRec(s, e, curSkeleton, depth + 1);
@@ -255,19 +304,25 @@ class TreeBuilder {
     depth = 0
   ) {
     let totalDepth = this.treeObj.depth;
-    if (depth > totalDepth || data.length < 100) return;
+    if (depth > totalDepth - 1) return;
 
+    const cur_node = this.treeObj.branches[depth];
+    const next_node = this.treeObj.branches[depth + 1];
+    let total_branch_num = 0;
+    cur_node.fork.forEach((f) => {
+      total_branch_num += f.at(-1);
+    });
     let { centroids, clusters } = kMeans(
       data,
-      depth > 0 ? this.treeObj.branches[depth].number : 1,
+      depth > 0 ? total_branch_num : 1,
       this.scene
     );
+    console.log(total_branch_num, centroids.length / 3);
     let l = centroids.length;
     let startVector, centroidVector, endVector;
-    let disturb = this.treeObj.disturb,
-      gravity = this.treeObj.gravity,
-      fork_min = this.treeObj.branches[depth].fork.min,
-      fork_max = this.treeObj.branches[depth].fork.max;
+    let disturb = depth === 0 ? 0 : this.treeObj.disturb;
+    let gravity = depth === 0 ? 0 : this.treeObj.gravity;
+    const fork = cur_node.fork;
 
     for (let i = 0; i < l; i += 3) {
       let nextStartArray = [];
@@ -293,13 +348,18 @@ class TreeBuilder {
       fatherSkeleton.add(curSkeleton);
 
       // 生成下次递归的开始节点
-      if (depth + 1 <= totalDepth) {
+      if (depth + 1 < totalDepth) {
         let curve = new THREE.CatmullRomCurve3(treeNodes);
         let points = curve.getPoints(50);
         let pointsLength = points.length;
-        for (let j = 0; j < this.treeObj.branches[depth + 1].number; j++) {
+        let next_total_branch_num = 0;
+        next_node.fork.forEach((f) => {
+          next_total_branch_num += f.at(-1);
+        });
+        for (let j = 0; j < next_total_branch_num; j++) {
           let base = Math.floor(
-            pointsLength * randomRangeLinear(fork_min, fork_max)
+            pointsLength *
+              (fork[i][0] + randomRangeLinear(-fork[i][1], fork[i][1]))
           );
           nextStartArray.push(points[base]);
         }
@@ -357,7 +417,7 @@ class TreeBuilder {
       flowerMaterial = new THREE.MeshPhongMaterial({
         map: flowerTexture,
         side: THREE.DoubleSide,
-        alphaTest: treeObj.leaf.alphaTest,
+        alphaTest: treeObj.leaf.alpha_test,
       });
     }
     leafTexture = loader.load(treeObj.path + "leaf_base.png");
@@ -367,7 +427,7 @@ class TreeBuilder {
       // map: loader.load(treeObj.path + "leaf_base_standard.png"),
       // normalMap: loader.load(treeObj.path + "leaf_normal_standard.png"),
       side: THREE.DoubleSide,
-      alphaTest: treeObj.leaf.alphaTest,
+      alphaTest: treeObj.leaf.alpha_test,
     });
 
     // 1. 实例化方式做树叶，递归函数前创建mesh
@@ -399,7 +459,8 @@ class TreeBuilder {
             g.style,
             g.width,
             g.height,
-            g.foldDegree,
+            g.width_foldDegree,
+            g.height_foldDegree,
             verticalAxis
           )
             .generate()
@@ -441,8 +502,8 @@ class TreeBuilder {
     // const treeNormalTexture = loader.load(
     //   treeObj.path + "tree_normal_standard.png"
     // );
-    twigTexture.wrapS = /*treeNormalTexture.wrapS =*/ THREE.RepeatWrapping;
-    twigTexture.repeat.set(2, 1);
+    twigTexture.wrapT = /*treeNormalTexture.wrapS =*/ THREE.RepeatWrapping;
+    twigTexture.repeat.set(1, 5);
     // treeNormalTexture.repeat.set(2, 1);
     const twigMaterial = new THREE.MeshPhongMaterial({
       map: twigTexture,

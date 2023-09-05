@@ -18,6 +18,8 @@ class CustomizeTree {
       ["垂丝海棠", 7],
       ["丁香", 8],
       ["凤凰木", 9],
+      ["水杉", 10],
+      ["落叶松", 11],
       // ["海棠", 10],
       // ["红果冬青", 11],
     ]);
@@ -35,7 +37,7 @@ class CustomizeTree {
         leaf: {
           geometry: { style: "cross", width: 0.7, height: 1 },
           scale: 3,
-          alphaTest: 0.3,
+          alpha_test: 0.3,
         },
         branches: [
           // root node
@@ -43,8 +45,8 @@ class CustomizeTree {
             start: new THREE.Vector3(0, 0, 0),
             end: new THREE.Vector3(0, 17, 0),
             radius: 0.6,
-            fork: [
-              // [ fork_position, noise1, fork_angle, noise2, next_level_length, noise3, number ]
+            sub_branches: [
+              // [ sub_branches_position, noise1, sub_branches_angle, noise2, next_level_length, noise3, number ]
               [0.4, 0.1, Math.PI / 2.5, Math.PI / 36, 7, 0.5, 6],
               [0.5, 0.05, Math.PI / 3, 0, 7, 0.5, 3],
               [0.6, 0.05, Math.PI / 5, 0, 6, 0.5, 3],
@@ -54,7 +56,7 @@ class CustomizeTree {
           },
           // middle node
           {
-            fork: [
+            sub_branches: [
               [0.7, 0.1, Math.PI / 4, Math.PI / 36, 3, 0.5, 3],
               [0.9, 0, 0, 0, 3, 0.5, 1],
             ],
@@ -82,7 +84,7 @@ class CustomizeTree {
         leaf: {
           geometry: { style: "cross", width: 1, height: 1 },
           scale: 0.8,
-          alphaTest: 0.2,
+          alpha_test: 0.2,
         },
         branches: [
           // root node
@@ -90,17 +92,17 @@ class CustomizeTree {
             start: new THREE.Vector3(0, 0, 0),
             end: new THREE.Vector3(0, 8, 0),
             radius: 0.3,
-            fork: [[0.6, 0.3, Math.PI / 5, Math.PI / 36, 4, 0.5, 5]],
+            sub_branches: [[0.6, 0.3, Math.PI / 5, Math.PI / 36, 4, 0.5, 5]],
           },
           // middle node
           {
-            fork: [[0.5, 0.4, Math.PI / 6, 0, 3, 0.5, 5]],
+            sub_branches: [[0.5, 0.4, Math.PI / 6, 0, 3, 0.5, 5]],
           },
           {
-            fork: [[0.5, 0.4, Math.PI / 6, 0, 2, 0.5, 2]],
+            sub_branches: [[0.5, 0.4, Math.PI / 6, 0, 2, 0.5, 2]],
           },
           {
-            fork: [[0.5, 0.4, Math.PI / 6, 0, 1, 0.5, 3]],
+            sub_branches: [[0.5, 0.4, Math.PI / 6, 0, 1, 0.5, 3]],
           },
           // leaf node
           {
@@ -121,7 +123,7 @@ class CustomizeTree {
         leaf: {
           geometry: { style: "cross", width: 0.5, height: 1, foldDegree: 0.3 },
           scale: 0.6,
-          alphaTest: 0.5,
+          alpha_test: 0.5,
         },
         branches: [
           // root node
@@ -129,7 +131,7 @@ class CustomizeTree {
             start: new THREE.Vector3(0, 0, 0),
             end: new THREE.Vector3(0, 15, 0),
             radius: 0.7,
-            fork: [
+            sub_branches: [
               [0.5, 0.1, Math.PI / 3, Math.PI / 36, 7, 0.5, 5],
               [0.8, 0.1, Math.PI / 4, Math.PI / 36, 6, 0.5, 3],
               [0.95, 0, 0, 0, 5, 0.5, 1],
@@ -137,19 +139,19 @@ class CustomizeTree {
           },
           // middle node
           {
-            fork: [
+            sub_branches: [
               [0.6, 0.2, Math.PI / 5, Math.PI / 36, 3, 0.5, 3],
               [0.95, 0, 0, 0, 3, 0.5, 1],
             ],
           },
           {
-            fork: [[0.6, 0.2, Math.PI / 5, Math.PI / 36, 2, 0.5, 3]],
+            sub_branches: [[0.6, 0.2, Math.PI / 5, Math.PI / 36, 2, 0.5, 3]],
           },
           {
-            fork: [[0.6, 0.3, Math.PI / 5, Math.PI / 36, 1, 0.5, 3]],
+            sub_branches: [[0.6, 0.3, Math.PI / 5, Math.PI / 36, 1, 0.5, 3]],
           },
           {
-            fork: [
+            sub_branches: [
               [0.5, 0.4, Math.PI / 5, Math.PI / 36, 2, 0, 3],
               [0.95, 0, 0, 0, 2, 0, 1],
             ],
@@ -173,11 +175,11 @@ class CustomizeTree {
         leaf: {
           geometry: { style: "surround", width: 1, height: 1 },
           scale: 0.15,
-          alphaTest: 0.5,
+          alpha_test: 0.5,
         },
         flower: {
           scale: 0.08,
-          alphaTest: 0.5,
+          alpha_test: 0.5,
         },
         branches: [
           // root node
@@ -185,17 +187,17 @@ class CustomizeTree {
             start: new THREE.Vector3(0, -0.1, 0),
             end: new THREE.Vector3(0, 0, 0),
             radius: 0.3,
-            fork: [[0.7, 0.1, Math.PI / 11, Math.PI / 36, 3, 0.5, 4]],
+            sub_branches: [[0.7, 0.1, Math.PI / 11, Math.PI / 36, 3, 0.5, 4]],
           },
           // middle node
           {
-            fork: [[0.7, 0.2, Math.PI / 6, Math.PI / 36, 2, 0.5, 3]],
+            sub_branches: [[0.7, 0.2, Math.PI / 6, Math.PI / 36, 2, 0.5, 3]],
           },
           {
-            fork: [[0.7, 0.2, Math.PI / 6, Math.PI / 36, 1, 0.5, 3]],
+            sub_branches: [[0.7, 0.2, Math.PI / 6, Math.PI / 36, 1, 0.5, 3]],
           },
           {
-            fork: [[0.7, 0.2, Math.PI / 6, Math.PI / 36, 0.8, 0.2, 3]],
+            sub_branches: [[0.7, 0.2, Math.PI / 6, Math.PI / 36, 0.8, 0.2, 3]],
           },
           // leaf node
           {
@@ -216,11 +218,11 @@ class CustomizeTree {
         leaf: {
           geometry: { style: "folded", width: 0.5, height: 1 },
           scale: 0.2,
-          alphaTest: 0.2,
+          alpha_test: 0.2,
         },
         flower: {
           scale: 0.08,
-          alphaTest: 0.5,
+          alpha_test: 0.5,
         },
         branches: [
           // root node
@@ -228,7 +230,7 @@ class CustomizeTree {
             start: new THREE.Vector3(0, 0, 0),
             end: new THREE.Vector3(0, 7, 0),
             radius: 0.25,
-            fork: [
+            sub_branches: [
               [0.3, 0.1, Math.PI / 3, 0, 4.5, 0, 6],
               [0.4, 0.1, Math.PI / 4, 0, 4, 0, 4],
               [0.6, 0.1, Math.PI / 5, 0, 2, 0, 4],
@@ -237,14 +239,14 @@ class CustomizeTree {
           },
           // middle node
           {
-            fork: [
+            sub_branches: [
               [0.4, 0.2, Math.PI / 5, 0, 2, 0.5, 3],
               [0.7, 0.2, Math.PI / 5, 0, 2, 0.5, 2],
               [0.9, 0, 0, 0, 1, 0.5, 1],
             ],
           },
           {
-            fork: [
+            sub_branches: [
               [0.5, 0.2, Math.PI / 6, 0, 1, 0, 3],
               [0.9, 0, 0, 0, 0.7, 0, 1],
             ],
@@ -269,7 +271,7 @@ class CustomizeTree {
         leaf: {
           geometry: { style: "folded", width: 1, height: 1 },
           scale: 0.4,
-          alphaTest: 0.2,
+          alpha_test: 0.2,
         },
         branches: [
           // root node
@@ -277,7 +279,7 @@ class CustomizeTree {
             start: new THREE.Vector3(0, 0, 0),
             end: new THREE.Vector3(0, 9, 0),
             radius: 0.25,
-            fork: [
+            sub_branches: [
               [0.3, 0.1, Math.PI / 3, 0, 4.5, 0, 6],
               [0.4, 0.1, Math.PI / 4, 0, 4, 0, 4],
               [0.6, 0.1, Math.PI / 5, 0, 2, 0, 4],
@@ -286,14 +288,14 @@ class CustomizeTree {
           },
           // middle node
           {
-            fork: [
+            sub_branches: [
               [0.4, 0.2, Math.PI / 5, 0, 2, 0.5, 3],
               [0.7, 0.2, Math.PI / 5, 0, 2, 0.5, 2],
               [0.9, 0, 0, 0, 1, 0.5, 1],
             ],
           },
           {
-            fork: [
+            sub_branches: [
               [0.5, 0.2, Math.PI / 6, 0, 1, 0, 3],
               [0.9, 0, 0, 0, 0.7, 0, 1],
             ],
@@ -317,11 +319,11 @@ class CustomizeTree {
         leaf: {
           geometry: { style: "folded", width: 0.5, height: 1 },
           scale: 0.2,
-          alphaTest: 0.2,
+          alpha_test: 0.2,
         },
         flower: {
           scale: 0.08,
-          alphaTest: 0.5,
+          alpha_test: 0.5,
         },
         branches: [
           // root node
@@ -329,7 +331,7 @@ class CustomizeTree {
             start: new THREE.Vector3(0, 0, 0),
             end: new THREE.Vector3(0, 7, 0),
             radius: 0.25,
-            fork: [
+            sub_branches: [
               [0.3, 0.1, Math.PI / 3, 0, 4.5, 0, 6],
               [0.4, 0.1, Math.PI / 4, 0, 4, 0, 4],
               [0.6, 0.1, Math.PI / 5, 0, 2, 0, 4],
@@ -338,14 +340,14 @@ class CustomizeTree {
           },
           // middle node
           {
-            fork: [
+            sub_branches: [
               [0.4, 0.2, Math.PI / 5, 0, 2, 0.5, 3],
               [0.7, 0.2, Math.PI / 5, 0, 2, 0.5, 2],
               [0.9, 0, 0, 0, 1, 0.5, 1],
             ],
           },
           {
-            fork: [
+            sub_branches: [
               [0.5, 0.2, Math.PI / 6, 0, 1, 0, 3],
               [0.9, 0, 0, 0, 0.7, 0, 1],
             ],
@@ -370,11 +372,11 @@ class CustomizeTree {
         leaf: {
           geometry: { style: "folded", width: 0.5, height: 1 },
           scale: 0.2,
-          alphaTest: 0.2,
+          alpha_test: 0.2,
         },
         flower: {
           scale: 0.08,
-          alphaTest: 0.5,
+          alpha_test: 0.5,
         },
         branches: [
           // root node
@@ -382,7 +384,7 @@ class CustomizeTree {
             start: new THREE.Vector3(0, 0, 0),
             end: new THREE.Vector3(0, 8, 0),
             radius: 0.25,
-            fork: [
+            sub_branches: [
               [0.3, 0, Math.PI / 3, 0, 4.5, 0, 6],
               [0.4, 0.1, Math.PI / 4, 0, 4, 0, 4],
               [0.6, 0.1, Math.PI / 5, 0, 2, 0, 4],
@@ -391,14 +393,14 @@ class CustomizeTree {
           },
           // middle node
           {
-            fork: [
+            sub_branches: [
               [0.4, 0.2, Math.PI / 5, 0, 2, 0.5, 3],
               [0.7, 0.2, Math.PI / 5, 0, 2, 0.5, 2],
               [0.9, 0, 0, 0, 1, 0.5, 1],
             ],
           },
           {
-            fork: [
+            sub_branches: [
               [0.5, 0.2, Math.PI / 6, 0, 1, 0, 3],
               [0.9, 0, 0, 0, 0.7, 0, 1],
             ],
@@ -418,16 +420,16 @@ class CustomizeTree {
         gravity: 5,
         shrink: { single: 0.2, multi: 0.45, root: false },
         tubular_segments: 10,
-        radial_segments: 4,
+        radial_segments: 6,
         sample_offset: 0.007,
         leaf: {
           geometry: { style: "folded", width: 0.5, height: 1 },
           scale: 0.2,
-          alphaTest: 0.2,
+          alpha_test: 0.2,
         },
         flower: {
           scale: 0.07,
-          alphaTest: 0.5,
+          alpha_test: 0.5,
         },
         branches: [
           // root node
@@ -435,20 +437,20 @@ class CustomizeTree {
             start: new THREE.Vector3(0, -0.1, 0),
             end: new THREE.Vector3(0, 0, 0),
             radius: 0.3,
-            fork: [[0.7, 0.1, Math.PI / 11, Math.PI / 36, 5, 0.5, 3]],
+            sub_branches: [[0.7, 0.1, Math.PI / 11, Math.PI / 36, 5, 0.5, 3]],
           },
           // middle node
           {
-            fork: [
+            sub_branches: [
               [0.4, 0.2, Math.PI / 5, Math.PI / 36, 2, 0.5, 3],
               [0.7, 0.2, Math.PI / 5, Math.PI / 36, 2, 0.5, 3],
             ],
           },
           {
-            fork: [[0.7, 0.2, Math.PI / 6, Math.PI / 36, 1, 0.5, 3]],
+            sub_branches: [[0.7, 0.2, Math.PI / 6, Math.PI / 36, 1, 0.5, 3]],
           },
           {
-            fork: [[0.7, 0.2, Math.PI / 6, Math.PI / 36, 0.8, 0.2, 5]],
+            sub_branches: [[0.7, 0.2, Math.PI / 6, Math.PI / 36, 0.8, 0.2, 5]],
           },
           // leaf node
           {
@@ -465,16 +467,16 @@ class CustomizeTree {
         gravity: -2,
         shrink: { single: 0.2, multi: 0.35, root: true },
         tubular_segments: 10,
-        radial_segments: 4,
+        radial_segments: 6,
         sample_offset: 0.005,
         leaf: {
           geometry: { style: "folded_reverse", width: 1, height: 1 },
           scale: 0.3,
-          alphaTest: 0.2,
+          alpha_test: 0.2,
         },
         flower: {
           scale: 0.15,
-          alphaTest: 0.5,
+          alpha_test: 0.5,
         },
         branches: [
           // root node
@@ -482,7 +484,7 @@ class CustomizeTree {
             start: new THREE.Vector3(0, 0, 0),
             end: new THREE.Vector3(0, 9, 0),
             radius: 0.25,
-            fork: [
+            sub_branches: [
               [0.3, 0.1, Math.PI / 3, 0, 4.5, 0, 6],
               [0.4, 0.1, Math.PI / 4, 0, 4, 0, 4],
               [0.6, 0.1, Math.PI / 5, 0, 2, 0, 4],
@@ -491,14 +493,14 @@ class CustomizeTree {
           },
           // middle node
           {
-            fork: [
+            sub_branches: [
               [0.4, 0.2, Math.PI / 5, 0, 2, 0.5, 3],
               [0.7, 0.2, Math.PI / 5, 0, 2, 0.5, 2],
               [0.9, 0, 0, 0, 1, 0.5, 1],
             ],
           },
           {
-            fork: [
+            sub_branches: [
               [0.5, 0.2, Math.PI / 6, 0, 1, 0, 3],
               [0.9, 0, 0, 0, 0.7, 0, 1],
             ],
@@ -507,6 +509,96 @@ class CustomizeTree {
           {
             leaves: [[0.7, 0.3, Math.PI / 3, 0, 5]],
             flowers: [[0.8, 0.2, Math.PI / 3, 0, 3]],
+          },
+        ],
+      },
+      {
+        name: "水杉",
+        path: "resources/images/shuishan/",
+        depth: 2,
+        disturb: 0.1,
+        gravity: 0.2,
+        shrink: { single: 0.15, multi: 0.2, root: true },
+        tubular_segments: 10,
+        radial_segments: 6,
+        sample_offset: 0.002,
+        leaf: {
+          geometry: {
+            style: "folded",
+            width: 1,
+            height: 2,
+            width_foldDegree: 0.3,
+            height_foldDegree: 0.5,
+          },
+          scale: 0.5,
+          alpha_test: 0.5,
+        },
+        branches: [
+          // root node
+          {
+            start: new THREE.Vector3(0, 0, 0),
+            end: new THREE.Vector3(0, 30, 0),
+            radius: 0.6,
+            sub_branches: [
+              [0.4, 0.2, Math.PI / 3, Math.PI / 36, 5, 0.5, 30],
+              [0.75, 0.2, Math.PI / 4, Math.PI / 36, 3, 0.5, 30],
+              [0.95, 0, 0, 0, 3, 0.5, 1],
+            ],
+          },
+          // middle node
+          {
+            sub_branches: [
+              [0.5, 0.1, Math.PI / 5, 0, 3, 0.5, 5],
+              [0.95, 0, 0, 0, 2, 0.5, 1],
+            ],
+          },
+          // leaf node
+          {
+            leaves: [[0.65, 0.3, Math.PI / 5, 0, 10]],
+          },
+        ],
+      },
+      {
+        name: "落叶松",
+        path: "resources/images/luoyesong/",
+        depth: 2,
+        disturb: 0.1,
+        gravity: -0.1,
+        shrink: { single: 0.15, multi: 0.2, root: true },
+        tubular_segments: 10,
+        radial_segments: 6,
+        sample_offset: 0.002,
+        leaf: {
+          geometry: {
+            style: "cross",
+            width: 1,
+            height: 2,
+          },
+          scale: 0.5,
+          alpha_test: 0.5,
+        },
+        branches: [
+          // root node
+          {
+            start: new THREE.Vector3(0, 0, 0),
+            end: new THREE.Vector3(0, 30, 0),
+            radius: 0.6,
+            sub_branches: [
+              [0.4, 0.2, Math.PI / 2.5, Math.PI / 36, 5, 0.5, 20],
+              [0.75, 0.2, Math.PI / 2.5, Math.PI / 36, 3, 0.5, 20],
+              [0.95, 0, 0, 0, 3, 0.5, 1],
+            ],
+          },
+          // middle node
+          {
+            sub_branches: [
+              [0.5, 0.1, Math.PI / 4, 0, 3, 0.5, 5],
+              [0.95, 0, 0, 0, 2, 0.5, 1],
+            ],
+          },
+          // leaf node
+          {
+            leaves: [[0.65, 0.3, Math.PI / 5, 0, 10]],
           },
         ],
       },
@@ -523,11 +615,11 @@ class CustomizeTree {
       //   leaf: {
       //     geometry: { style: "folded", width: 0.5, height: 1 },
       //     scale: 0.3,
-      //     alphaTest: 0.5,
+      //     alpha_test: 0.5,
       //   },
       //   flower: {
       //     scale: 0.1,
-      //     alphaTest: 0.5,
+      //     alpha_test: 0.5,
       //   },
       //   branches: [
       //     // root node
@@ -535,7 +627,7 @@ class CustomizeTree {
       //       start: new THREE.Vector3(0, 0, 0),
       //       end: new THREE.Vector3(0, 10, 0),
       //       radius: 0.25,
-      //       fork: [
+      //       sub_branches: [
       //         [0.4, 0.05, Math.PI / 3, 0, 4.5, 0, 6],
       //         [0.5, 0.1, Math.PI / 4, 0, 4, 0, 4],
       //         [0.6, 0.1, Math.PI / 5, 0, 2, 0, 4],
@@ -544,14 +636,14 @@ class CustomizeTree {
       //     },
       //     // middle node
       //     {
-      //       fork: [
+      //       sub_branches: [
       //         [0.4, 0.2, Math.PI / 5, 0, 2, 0.5, 3],
       //         [0.7, 0.2, Math.PI / 5, 0, 2, 0.5, 2],
       //         [0.9, 0, 0, 0, 1, 0.5, 1],
       //       ],
       //     },
       //     {
-      //       fork: [
+      //       sub_branches: [
       //         [0.5, 0.2, Math.PI / 6, 0, 1, 0, 3],
       //         [0.9, 0, 0, 0, 0.7, 0, 1],
       //       ],
@@ -576,12 +668,12 @@ class CustomizeTree {
       //   leaf: {
       //     geometry: { style: "folded", width: 0.3, height: 1 },
       //     scale: 0.3,
-      //     alphaTest: 0.5,
+      //     alpha_test: 0.5,
       //   },
       //   fruit: {
       //     geometry: { style: "cross", width: 0.5, height: 1 },
       //     scale: 0.15,
-      //     alphaTest: 0.5,
+      //     alpha_test: 0.5,
       //   },
       //   branches: [
       //     // root node
@@ -589,18 +681,18 @@ class CustomizeTree {
       //       start: new THREE.Vector3(0, 0, 0),
       //       end: new THREE.Vector3(0, 3, 0),
       //       radius: 0.2,
-      //       fork: [[0.95, 0, Math.PI / 5, Math.PI / 36, 3, 0.5, 2]],
+      //       sub_branches: [[0.95, 0, Math.PI / 5, Math.PI / 36, 3, 0.5, 2]],
       //     },
       //     // middle node
       //     {
-      //       fork: [
+      //       sub_branches: [
       //         [0.4, 0.2, Math.PI / 3, 0, 2, 0.5, 6],
       //         [0.7, 0.2, Math.PI / 3, 0, 2, 0.5, 4],
       //         [0.9, 0, 0, 0, 1, 0.5, 1],
       //       ],
       //     },
       //     {
-      //       fork: [
+      //       sub_branches: [
       //         [0.5, 0.2, Math.PI / 4, 0, 1, 0, 4],
       //         [0.9, 0, 0, 0, 0.7, 0, 1],
       //       ],

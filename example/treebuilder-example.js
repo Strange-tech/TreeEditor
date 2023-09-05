@@ -33,8 +33,8 @@ async function main() {
   };
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xcccccc);
-
+  // scene.background = new THREE.Color(0xcccccc);
+  scene.background = new THREE.Color(0xffffff);
   const fov = 45;
   const aspect = 2;
   const near = 0.1;
@@ -101,7 +101,7 @@ async function main() {
   };
 
   const customizeTree = new CustomizeTree();
-  let treeObj = customizeTree.getTree("八棱海棠");
+  let treeObj = customizeTree.getTree("落叶松");
 
   builder.init(treeObj, true, "y-axis");
   let skeleton = builder.buildSkeleton();
@@ -179,18 +179,24 @@ async function main() {
     丁香: function () {
       buildtree(species[8]);
     },
-    香樟: function () {
+    // 香樟: function () {
+    //   buildtree(species[9]);
+    // },
+    凤凰木: function () {
       buildtree(species[9]);
     },
-    凤凰木: function () {
+    水杉: function () {
       buildtree(species[10]);
     },
-    海棠: function () {
+    落叶松: function () {
       buildtree(species[11]);
     },
-    红果冬青: function () {
-      buildtree(species[12]);
-    },
+    // 海棠: function () {
+    //   buildtree(species[11]);
+    // },
+    // 红果冬青: function () {
+    //   buildtree(species[12]);
+    // },
   };
   const gui = new GUI();
   const tree_selector = gui.addFolder("tree");

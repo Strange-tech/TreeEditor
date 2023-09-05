@@ -47,35 +47,28 @@ async function main() {
   );
 
   // scene.add(plain);
+  const treeObj = new CustomizeTree().getTree("普通乔木");
+  const builder = new TreeBuilder(treeObj, true, scene);
+  const loader = new PCDLoader();
+  loader.load(`resources/urban3d/individualpoint.pcd`, (pcd) => {
+    pcd.material.size = 0.3;
+    pcd.geometry.rotateX(-Math.PI / 2);
+    pcd.geometry.translate(0, 0, 0);
+    scene.add(pcd);
+    lookAt(pcd, camera, controls);
+    const data = loadData(pcd);
+    const skeleton = builder.buildKmeansSkeleton(data, 32);
 
-  const customizeTrees = new CustomizeTree();
-  const treeObj = customizeTrees.getTree("木芙蓉");
-  const builder = new TreeBuilder(treeObj, true);
-  const skeleton = builder.buildSkeleton();
-  const tree = builder.buildTree(skeleton);
-  scene.add(tree);
-  lookAt(tree, camera, controls);
+    const line = new THREE.Group();
+    const pointGroup = new THREE.Group();
+    drawLine(skeleton.children[0], line, pointGroup);
+    scene.add(line);
+    scene.add(pointGroup);
 
-  console.log(tree);
-
-  // const loader = new PCDLoader();
-  // loader.load(`resources/urban3d/individual.pcd`, (pcd) => {
-  //   pcd.material.size = 0.2;
-  //   scene.add(pcd);
-  //   lookAt(pcd, camera, controls);
-  //   const data = loadData(pcd);
-  //   const skeleton = builder.buildKmeansSkeleton(data, 32);
-
-  //   const line = new THREE.Group();
-  //   const pointGroup = new THREE.Group();
-  //   drawLine(skeleton.children[0], line, pointGroup);
-  //   scene.add(line);
-  //   scene.add(pointGroup);
-
-  //   const tree = builder.buildTree(skeleton);
-  //   tree.position.set(20, 0, 0);
-  //   scene.add(tree);
-  // });
+    // const tree = builder.buildTree(skeleton);
+    // tree.position.set(20, 0, 0);
+    // scene.add(tree);
+  });
 
   function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;

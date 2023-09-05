@@ -7,11 +7,19 @@ import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js
  *
  *************************************************************************************/
 class LeafGeometry {
-  constructor(style, width, height, foldDegree = 0, verticalAxis = "y-axis") {
+  constructor(
+    style,
+    width,
+    height,
+    width_foldDegree = 0,
+    height_foldDegree = 0,
+    verticalAxis = "y-axis"
+  ) {
     this.style = style;
     this.width = width;
     this.height = height;
-    this.foldDegree = foldDegree;
+    this.width_foldDegree = width_foldDegree;
+    this.height_foldDegree = height_foldDegree;
     this.verticalAxis = verticalAxis;
   }
 
@@ -27,16 +35,52 @@ class LeafGeometry {
   }
 
   generateFolded() {
-    const { width, height, foldDegree, verticalAxis } = this;
-    // to be changed...
+    const { width, height, width_foldDegree, height_foldDegree, verticalAxis } =
+      this;
     const geometry = new THREE.BufferGeometry();
     let x = width / 2,
       y = height,
-      z = width * foldDegree;
-    const vertices = [-x, 0, z, 0, 0, 0, x, 0, z, x, y, z, 0, y, 0, -x, y, z];
-    const uvs = [0, 0, 0.5, 0, 1, 0, 1, 1, 0.5, 1, 0, 1];
-    const normals = [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1];
-    const indices = [0, 1, 4, 4, 5, 0, 1, 2, 3, 3, 4, 1];
+      z = width * width_foldDegree;
+    let add_z = height * height_foldDegree;
+    const vertices = [
+      -x,
+      0,
+      z,
+      0,
+      0,
+      0,
+      x,
+      0,
+      z,
+      -x,
+      y / 2,
+      z,
+      0,
+      y / 2,
+      0,
+      x,
+      y / 2,
+      z,
+      -x,
+      y,
+      z + add_z,
+      0,
+      y,
+      add_z,
+      x,
+      y,
+      z + add_z,
+    ];
+    const uvs = [
+      0, 0, 0.5, 0, 1, 0, 0, 0.5, 0.5, 0.5, 1, 0.5, 0, 1, 0.5, 1, 1, 1,
+    ];
+    const normals = [
+      0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
+      0, 1,
+    ];
+    const indices = [
+      0, 1, 3, 4, 3, 1, 1, 2, 4, 5, 4, 2, 3, 4, 6, 7, 6, 4, 4, 5, 7, 8, 7, 5,
+    ];
     geometry.setAttribute(
       "position",
       new THREE.BufferAttribute(new Float32Array(vertices), 3)
@@ -50,8 +94,8 @@ class LeafGeometry {
       new THREE.BufferAttribute(new Float32Array(uvs), 2)
     );
     geometry.setIndex(indices);
-    if (verticalAxis === "z-axis")
-      geometry.rotateX(Math.PI / 2).rotateZ(Math.PI / 2);
+    // if (verticalAxis === "z-axis")
+    //   geometry.rotateX(Math.PI / 2).rotateZ(Math.PI / 2);
     return geometry;
   }
 
