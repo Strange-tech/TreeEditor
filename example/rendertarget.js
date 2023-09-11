@@ -11,7 +11,7 @@ async function main() {
   renderer.shadowMap.enabled = true;
 
   const scene = new THREE.Scene();
-  // scene.background = new THREE.Color(0xffffff);
+  scene.background = new THREE.Color(0xffffff);
 
   const fov = 45;
   const aspect = 2;
@@ -75,7 +75,7 @@ async function main() {
   };
 
   const customizeTree = new CustomizeTree();
-  let treeObj = customizeTree.getTree("凤凰木");
+  let treeObj = customizeTree.getTree("普通乔木");
 
   builder.init(treeObj, true, "y-axis");
   let skeleton = builder.buildSkeleton();

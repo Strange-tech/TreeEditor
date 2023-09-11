@@ -66,7 +66,7 @@ async function main() {
   });
 
   const axesHelper = new THREE.AxesHelper(5);
-  scene.add(axesHelper);
+  // scene.add(axesHelper);
 
   const planeSize = 50;
   const plainGeometry = new THREE.PlaneGeometry(planeSize, planeSize, 10, 10);
@@ -78,7 +78,7 @@ async function main() {
   const plain = new THREE.Mesh(plainGeometry, planeMaterial);
   csm.setupMaterial(planeMaterial);
   plain.receiveShadow = true;
-  scene.add(plain);
+  // scene.add(plain);
 
   const builder = new TreeBuilder();
 
@@ -101,7 +101,7 @@ async function main() {
   };
 
   const customizeTree = new CustomizeTree();
-  let treeObj = customizeTree.getTree("落叶松");
+  let treeObj = customizeTree.getTree("普通乔木");
 
   builder.init(treeObj, true, "y-axis");
   let skeleton = builder.buildSkeleton();

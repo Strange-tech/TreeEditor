@@ -65,51 +65,6 @@ class TreeBuilder {
     }
   }
 
-  randomMatrices(
-    curve,
-    points,
-    base_position,
-    position_noise,
-    base_angle,
-    angle_noise,
-    number
-  ) {
-    const matrices = [];
-    let pointsLength = points.length;
-    let rot1 = new THREE.Matrix4().makeRotationAxis(
-      this.X,
-      Math.PI / 2 + randomRangeLinear(-0.3, 0.3)
-    );
-    for (let i = 1; i <= number; i++) {
-      let base = Math.floor(
-        pointsLength *
-          (base_position + randomRangeLinear(-position_noise, position_noise))
-      );
-      let position = points[base];
-      let tangent = curve.getTangent(base / pointsLength);
-      base_angle = -base_angle;
-      let tangent_xoz = tangent
-        .clone()
-        .setY(0)
-        .applyAxisAngle(
-          this.Y,
-          base_angle + randomRangeLinear(-angle_noise, angle_noise)
-        );
-      let rot_angle = this.Z.angleTo(tangent_xoz);
-      if (tangent_xoz.x < 0) rot_angle = -rot_angle;
-      let rot2 = new THREE.Matrix4().makeRotationAxis(this.Y, rot_angle);
-      let trans = new THREE.Matrix4().makeTranslation(
-        position.x,
-        position.y,
-        position.z
-      );
-      let rot = new THREE.Matrix4().multiply(rot2).multiply(rot1);
-      let matrix = new THREE.Matrix4().multiply(trans).multiply(rot);
-      matrices.push(matrix);
-    }
-    return matrices;
-  }
-
   // randomMatrices(
   //   curve,
   //   points,
@@ -121,7 +76,10 @@ class TreeBuilder {
   // ) {
   //   const matrices = [];
   //   let pointsLength = points.length;
-  //   let dir;
+  //   let rot1 = new THREE.Matrix4().makeRotationAxis(
+  //     this.X,
+  //     Math.PI / 2 + randomRangeLinear(-0.3, 0.3)
+  //   );
   //   for (let i = 1; i <= number; i++) {
   //     let base = Math.floor(
   //       pointsLength *
@@ -129,44 +87,86 @@ class TreeBuilder {
   //     );
   //     let position = points[base];
   //     let tangent = curve.getTangent(base / pointsLength);
-  //     let orthogonal = new THREE.Vector3(
-  //       0,
-  //       1,
-  //       -tangent.y / tangent.z
-  //     ).normalize();
-  //     if (i === 1) {
-  //       dir = new THREE.Vector3()
-  //         .copy(tangent)
-  //         .applyAxisAngle(
-  //           orthogonal,
-  //           base_angle + randomRangeLinear(-angle_noise, angle_noise)
-  //         )
-  //         .applyAxisAngle(tangent, (Math.random() * Math.PI) / 2)
-  //         .normalize();
-  //     } else {
-  //       dir.applyAxisAngle(tangent, (2 * Math.PI) / number).normalize();
-  //     }
-  //     let rot_angle = this.verticalAxis.angleTo(dir);
-  //     let rot_axis = new THREE.Vector3()
-  //       .crossVectors(this.verticalAxis, dir)
-  //       .normalize();
-
+  //     base_angle = -base_angle;
+  //     let tangent_xoz = tangent
+  //       .clone()
+  //       .setY(0)
+  //       .applyAxisAngle(
+  //         this.Y,
+  //         base_angle + randomRangeLinear(-angle_noise, angle_noise)
+  //       );
+  //     let rot_angle = this.Z.angleTo(tangent_xoz);
+  //     if (tangent_xoz.x < 0) rot_angle = -rot_angle;
+  //     let rot2 = new THREE.Matrix4().makeRotationAxis(this.Y, rot_angle);
   //     let trans = new THREE.Matrix4().makeTranslation(
   //       position.x,
   //       position.y,
   //       position.z
   //     );
-  //     let rot1 = new THREE.Matrix4().makeRotationAxis(
-  //         this.verticalAxis,
-  //         Math.random() * 2 * Math.PI
-  //       ), // (0,2pi)
-  //       rot2 = new THREE.Matrix4().makeRotationAxis(rot_axis, rot_angle);
   //     let rot = new THREE.Matrix4().multiply(rot2).multiply(rot1);
   //     let matrix = new THREE.Matrix4().multiply(trans).multiply(rot);
   //     matrices.push(matrix);
   //   }
   //   return matrices;
   // }
+
+  randomMatrices(
+    curve,
+    points,
+    base_position,
+    position_noise,
+    base_angle,
+    angle_noise,
+    number
+  ) {
+    const matrices = [];
+    let pointsLength = points.length;
+    let dir;
+    for (let i = 1; i <= number; i++) {
+      let base = Math.floor(
+        pointsLength *
+          (base_position + randomRangeLinear(-position_noise, position_noise))
+      );
+      let position = points[base];
+      let tangent = curve.getTangent(base / pointsLength);
+      let orthogonal = new THREE.Vector3(
+        0,
+        1,
+        -tangent.y / tangent.z
+      ).normalize();
+      if (i === 1) {
+        dir = new THREE.Vector3()
+          .copy(tangent)
+          .applyAxisAngle(
+            orthogonal,
+            base_angle + randomRangeLinear(-angle_noise, angle_noise)
+          )
+          .applyAxisAngle(tangent, (Math.random() * Math.PI) / 2)
+          .normalize();
+      } else {
+        dir.applyAxisAngle(tangent, (2 * Math.PI) / number).normalize();
+      }
+      let rot_angle = this.verticalAxis.angleTo(dir);
+      let rot_axis = new THREE.Vector3()
+        .crossVectors(this.verticalAxis, dir)
+        .normalize();
+
+      let trans = new THREE.Matrix4().makeTranslation(
+        position.x,
+        position.y,
+        position.z
+      );
+      let rot1 = new THREE.Matrix4().makeRotationAxis(
+          this.verticalAxis,
+          Math.random() * 2 * Math.PI
+        ), // (0,2pi)
+        rot2 = new THREE.Matrix4().makeRotationAxis(rot_axis, rot_angle);
+      let rot = new THREE.Matrix4().multiply(rot2).multiply(rot1);
+      let matrix = new THREE.Matrix4().multiply(trans).multiply(rot);
+      matrices.push(matrix);
+    }
+    return matrices;
+  }
 
   buildSkeletonRec(start, end, fatherSkeleton, depth = 0) {
     if (depth > this.treeObj.depth) return;

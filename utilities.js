@@ -55,12 +55,12 @@ const drawLine = (skeleton, fatherLine, pointGroup) => {
   });
 };
 
-const toSeePoint = (point) => {
+const toSeePoint = (position, color) => {
   const mesh = new THREE.Mesh(
-    new THREE.SphereGeometry(0.1),
-    new THREE.MeshBasicMaterial({ color: "red" })
+    new THREE.SphereGeometry(2),
+    new THREE.MeshBasicMaterial({ color: color })
   );
-  mesh.position.copy(point);
+  mesh.position.copy(position);
   return mesh;
 };
 

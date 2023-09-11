@@ -12,6 +12,8 @@ import { LeafGeometry } from "../leaf_flower_fruit/LeafGeometry";
 import { Terrain } from "../lib/Terrain";
 import { Octree } from "../lib/Octree";
 import { GUIController } from "../lib/GUIController";
+import { toSeePoint } from "../utilities";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 function main() {
   // if (WebGPU.isAvailable() === false) {
@@ -30,8 +32,15 @@ function main() {
   const near = 0.1;
   const far = 5000;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  camera.position.set(1000, 1000, 0);
+  camera.position.set(0, 200, 200);
+  camera.lookAt(0, 0, 0);
+  // const camerahelper = new THREE.CameraHelper(camera);
+  // scene.add(camerahelper);
+  // const another_camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+  // another_camera.position.set(400, 400, 0);
+  // another_camera.lookAt(0, 0, 0);
 
+  // const controls = new OrbitControls(camera, renderer.domElement);
   const controls = new MapControls(camera, renderer.domElement);
   controls.minDistance = 100;
   controls.maxDistance = 3000;
@@ -112,12 +121,13 @@ function main() {
   let idx_x, size;
 
   const boundary = terrain.getBoundingBox();
-  // const range_box_size = 3;
 
-  customizeTree.content.forEach((treeObj, index) => {
+  const species = Array.from(customizeTree.indices.keys());
+  species.forEach((name, index) => {
+    let treeObj = customizeTree.getTree(name);
     let details = 原神启动(treebuilder, treeObj, 300, 2000);
     let instancedlod = new InstancedLOD(scene, camera, treeObj.name);
-    let octree = new Octree(boundary, 10, 0);
+    let octree = new Octree(boundary, 5, 0);
     instancedlod.setOctree(octree);
     let total = 100000;
     if (index === 0) total = 150000;
@@ -156,10 +166,12 @@ function main() {
       size = Math.random() + 0.5;
       scale.set(size, size, size);
       position.set(x, y, z);
+      // octree.insert(new THREE.Matrix4().makeTranslation(x, y, z));
       quaterion.setFromAxisAngle(y_axis, Math.random() * Math.PI * 2);
       octree.insert(new THREE.Matrix4().compose(position, quaterion, scale));
       cnt++;
     }
+    // console.log(octree);
     instancedLODs.push(instancedlod);
   });
 
@@ -225,7 +237,7 @@ function main() {
       camera.aspect = canvas.clientWidth / canvas.clientHeight;
       camera.updateProjectionMatrix();
     }
-    if (cnt < points.length) camera.position.copy(points[cnt++]);
+    // if (cnt < points.length) camera.position.copy(points[cnt++]);
     controls.update();
     instancedLODs.forEach((instance) => {
       instance.render();
@@ -239,20 +251,6 @@ function main() {
     render();
   }
   animate();
-
-  // function renderForWander() {
-  //   guiController.moveCamera();
-  //   render();
-  //   let id = requestAnimationFrame(renderForWander);
-  //   if (guiController.reachWanderEnd()) {
-  //     cancelAnimationFrame(id);
-  //     camera.lookAt(0, 0, -100);
-  //     animate();
-  //   }
-  // }
-
-  // guiController.setWander(points, 500, 490);
-  // renderForWander();
 }
 
 main();
