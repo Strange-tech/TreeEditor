@@ -64,7 +64,7 @@ class CustomizeTree {
           {
             leaves: [
               // [ leaves_position, noise1, leaves_angle, noise2, number]
-              [0.6, 0.35, Math.PI / 4, 0, 6],
+              [0.6, 0.35, Math.PI / 4, 0, 3],
               [0.95, 0, 0, 0, 1],
             ],
           },
@@ -157,7 +157,7 @@ class CustomizeTree {
           },
           // leaf node
           {
-            leaves: [[0.6, 0.4, Math.PI / 5, 0, 8]],
+            leaves: [[0.6, 0.4, Math.PI / 5, 0, 6]],
           },
         ],
       },

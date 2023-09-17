@@ -48,15 +48,15 @@ function main() {
 
   const guiController = new GUIController(camera);
 
-  const amLight = new THREE.AmbientLight(0xffffff, 0.1);
+  const amLight = new THREE.AmbientLight(0xffffff, 1);
   scene.add(amLight);
 
   const csm = new CSM({
-    maxFar: 500,
+    maxFar: 1000,
     cascades: 3,
     mode: "practical",
     parent: scene,
-    shadowMapSize: 256,
+    shadowMapSize: 512,
     lightDirection: new THREE.Vector3(-1, -1, -1).normalize(),
     lightColor: new THREE.Color(0x000020),
     lightIntensity: 0.5,
@@ -80,7 +80,7 @@ function main() {
     let material = new THREE.MeshBasicMaterial({
       map: texture,
       side: THREE.DoubleSide,
-      color: 0xcdcdcd,
+      color: 0xb3b3b3,
       // transparent: true,
       alphaTest: 0.9,
     });
@@ -125,7 +125,7 @@ function main() {
   const species = Array.from(customizeTree.indices.keys());
   species.forEach((name, index) => {
     let treeObj = customizeTree.getTree(name);
-    let details = 原神启动(treebuilder, treeObj, 300, 2000);
+    let details = 原神启动(treebuilder, treeObj, 400, 2000);
     let instancedlod = new InstancedLOD(scene, camera, treeObj.name);
     let octree = new Octree(boundary, 5, 0);
     instancedlod.setOctree(octree);
