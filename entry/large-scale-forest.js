@@ -48,7 +48,7 @@ function main() {
 
   const guiController = new GUIController(camera);
 
-  const amLight = new THREE.AmbientLight(0xffffff, 1);
+  const amLight = new THREE.AmbientLight(0xffffff, 0.2);
   scene.add(amLight);
 
   const csm = new CSM({
@@ -125,7 +125,7 @@ function main() {
   const species = Array.from(customizeTree.indices.keys());
   species.forEach((name, index) => {
     let treeObj = customizeTree.getTree(name);
-    let details = 原神启动(treebuilder, treeObj, 400, 2000);
+    let details = 原神启动(treebuilder, treeObj, 300, 2000);
     let instancedlod = new InstancedLOD(scene, camera, treeObj.name);
     let octree = new Octree(boundary, 5, 0);
     instancedlod.setOctree(octree);
@@ -210,10 +210,10 @@ function main() {
   const keypoints = [
     new THREE.Vector3(1000, 1000, 0),
     new THREE.Vector3(1000, 200, 0),
-    new THREE.Vector3(400, 200, 0),
+    new THREE.Vector3(200, 140, 0),
   ];
   const curve = new THREE.CatmullRomCurve3(keypoints);
-  const points = curve.getPoints(500);
+  const points = curve.getPoints(1000);
   let cnt = 0;
 
   function resizeRendererToDisplaySize(renderer) {
@@ -237,7 +237,7 @@ function main() {
       camera.aspect = canvas.clientWidth / canvas.clientHeight;
       camera.updateProjectionMatrix();
     }
-    // if (cnt < points.length) camera.position.copy(points[cnt++]);
+    if (cnt < points.length) camera.position.copy(points[cnt++]);
     controls.update();
     instancedLODs.forEach((instance) => {
       instance.render();
