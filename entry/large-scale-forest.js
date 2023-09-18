@@ -14,6 +14,7 @@ import { Octree } from "../lib/Octree";
 import { GUIController } from "../lib/GUIController";
 import { toSeePoint } from "../utilities";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import Stats from "three/examples/jsm/libs/stats.module.js";
 
 function main() {
   // if (WebGPU.isAvailable() === false) {
@@ -21,7 +22,9 @@ function main() {
   //   throw new Error("No WebGPU support");
   // }
   const canvas = document.querySelector("#c");
-  const renderer = new THREE.WebGLRenderer({ canvas: canvas });
+  const stats = new Stats();
+  document.body.appendChild(stats.domElement);
+  const renderer = new THREE.WebGLRenderer({canvas});
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -213,7 +216,7 @@ function main() {
     new THREE.Vector3(200, 140, 0),
   ];
   const curve = new THREE.CatmullRomCurve3(keypoints);
-  const points = curve.getPoints(1000);
+  const points = curve.getPoints(500);
   let cnt = 0;
 
   function resizeRendererToDisplaySize(renderer) {
@@ -243,6 +246,7 @@ function main() {
       instance.render();
     });
     csm.update();
+    stats.update();
     renderer.render(scene, camera);
   }
 
