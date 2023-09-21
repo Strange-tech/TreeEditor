@@ -13,6 +13,7 @@
     "three": "^0.156.1"
   },
   "devDependencies": {
-    "parcel": "latest"
+    "parcel": "latest",
+    "prettier": "3.0.3"
   }
 }

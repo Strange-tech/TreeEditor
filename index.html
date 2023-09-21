@@ -1,14 +1,25 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <meta charset="utf-8" />
     <title>My first three.js app</title>
     <link rel="stylesheet" href="style.css" defer />
-    <script type="module" src="./entry/large-scale-forest.js" defer>
+    <script type="module" src="./example/memory-manager.js" defer>
       // Our Javascript will go here.
     </script>
   </head>
   <body>
-    <canvas id="c"></canvas>
+    <div id="blocker">
+      <div id="instructions">
+        <p style="font-size: 36px">Click to play</p>
+        <p>
+          Move: WASD<br />
+          Jump: SPACE<br />
+          Look: MOUSE
+        </p>
+      </div>
+    </div>
+
+    <!-- <canvas id="c"></canvas> -->
   </body>
 </html>

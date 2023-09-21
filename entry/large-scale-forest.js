@@ -233,7 +233,9 @@ function main() {
     return needResize;
   }
 
+
   function render() {
+
     // 图像不随屏幕拉伸改变
     if (resizeRendererToDisplaySize(renderer)) {
       const canvas = renderer.domElement;
@@ -242,9 +244,9 @@ function main() {
     }
     if (cnt < points.length) camera.position.copy(points[cnt++]);
     controls.update();
-    instancedLODs.forEach((instance) => {
-      instance.render();
-    });
+      instancedLODs.forEach((instance) => {
+        instance.render();
+      });
     csm.update();
     stats.update();
     renderer.render(scene, camera);
