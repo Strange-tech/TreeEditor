@@ -24,7 +24,7 @@ function main() {
   const canvas = document.querySelector("#c");
   const stats = new Stats();
   document.body.appendChild(stats.domElement);
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({ canvas });
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -33,7 +33,7 @@ function main() {
   const fov = 45;
   const aspect = 2;
   const near = 0.1;
-  const far = 5000;
+  const far = 4000;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
   camera.position.set(0, 200, 200);
   camera.lookAt(0, 0, 0);
@@ -46,7 +46,7 @@ function main() {
   // const controls = new OrbitControls(camera, renderer.domElement);
   const controls = new MapControls(camera, renderer.domElement);
   controls.minDistance = 100;
-  controls.maxDistance = 3000;
+  controls.maxDistance = 1000;
   // controls.enableDamping = true;
 
   const guiController = new GUIController(camera);
@@ -104,8 +104,8 @@ function main() {
     return details;
   }
 
-  const planeSize = 15000;
-  const vertexNumber = 1500;
+  const planeSize = 30000;
+  const vertexNumber = 1600;
 
   // const axesHelper = new THREE.AxesHelper(1000);
   // scene.add(axesHelper);
@@ -128,7 +128,7 @@ function main() {
   const species = Array.from(customizeTree.indices.keys());
   species.forEach((name, index) => {
     let treeObj = customizeTree.getTree(name);
-    let details = 原神启动(treebuilder, treeObj, 300, 2000);
+    let details = 原神启动(treebuilder, treeObj, 400, 2000);
     let instancedlod = new InstancedLOD(scene, camera, treeObj.name);
     let octree = new Octree(boundary, 5, 0);
     instancedlod.setOctree(octree);
@@ -166,7 +166,8 @@ function main() {
       //   console.log("query");
       // } while (found.length > 0);
 
-      size = Math.random() + 0.5;
+      if (index != 0 && index != 2) size = Math.random() + 2;
+      else size = Math.random() + 0.5;
       scale.set(size, size, size);
       position.set(x, y, z);
       // octree.insert(new THREE.Matrix4().makeTranslation(x, y, z));
@@ -211,8 +212,8 @@ function main() {
   //-----------------------------------------------------------------------------
   // WANDERER
   const keypoints = [
-    new THREE.Vector3(1000, 1000, 0),
-    new THREE.Vector3(1000, 200, 0),
+    new THREE.Vector3(700, 500, 0),
+    new THREE.Vector3(700, 200, 0),
     new THREE.Vector3(200, 140, 0),
   ];
   const curve = new THREE.CatmullRomCurve3(keypoints);
