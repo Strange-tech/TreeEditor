@@ -2,8 +2,9 @@ import * as THREE from "three";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
+import Stats from "three/examples/jsm/libs/stats.module.js";
 
-let camera, scene, renderer, controls;
+let camera, scene, renderer, controls, stats;
 
 const objects = [];
 
@@ -16,6 +17,21 @@ let moveRight = false;
 let canJump = false;
 let avatarHeight = 50;
 let avatarSpeed = 500.0;
+
+let big_house = {
+  scale: [1, 1, 1],
+  position: [0, 201, 0],
+};
+let small_house = {
+  scale: [0.1, 0.1, 0.1],
+  position: [1000, 0, 1000],
+};
+
+
+let scene_objects = [];
+
+scene_objects.push(big_house);
+scene_objects.push(small_house);
 
 let prevTime = performance.now();
 const velocity = new THREE.Vector3();
@@ -31,7 +47,7 @@ function init() {
     75,
     window.innerWidth / window.innerHeight,
     1,
-    1000,
+    800,
   );
   camera.position.y = avatarHeight;
 
@@ -183,13 +199,19 @@ function init() {
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
+  stats = new Stats();
+  document.body.appendChild(stats.domElement);
 
   //
 
   window.addEventListener("resize", onWindowResize);
 }
 
-function load_GLTF_with_DRACO(path) {
+function load_GLTF_with_DRACO(
+  path,
+  scale_array = [1, 1, 1],
+  position_array = [20, 201, 20],
+) {
   const dracoLoader = new DRACOLoader();
   dracoLoader.setDecoderPath("./resources/gltf/");
 
@@ -199,7 +221,8 @@ function load_GLTF_with_DRACO(path) {
     path,
     function (gltf) {
       const model = gltf.scene;
-      model.position.set(20, 201, 20);
+      model.scale.set(...scale_array);
+      model.position.set(...position_array);
       scene.add(model);
     },
     undefined,
@@ -242,7 +265,8 @@ function animate() {
     direction.x = Number(moveRight) - Number(moveLeft);
     direction.normalize(); // this ensures consistent movements in all directions
 
-    if (moveForward || moveBackward) velocity.z -= direction.z * avatarSpeed * delta;
+    if (moveForward || moveBackward)
+      velocity.z -= direction.z * avatarSpeed * delta;
     if (moveLeft || moveRight) velocity.x -= direction.x * avatarSpeed * delta;
 
     if (onObject === true) {
@@ -265,10 +289,10 @@ function animate() {
 
   prevTime = time;
 
-  if (camera.position.x > 10 && !flag) {
+  if (camera.position.x > 100 && !flag) {
     load_GLTF_with_DRACO("resources/models/LittlestTokyo.glb");
     flag = true;
   }
-
+  stats.update();
   renderer.render(scene, camera);
 }

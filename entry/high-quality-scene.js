@@ -3,19 +3,25 @@ import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
 import { TreeBuilder } from "../TreeBuilder";
 import { CustomizeTree } from "../CustomizeTree";
 import { Point, QuadTree, Rectangle } from "../lib/Quadtree";
+import Stats from "three/examples/jsm/libs/stats.module.js";
+
 
 function main() {
   const canvas = document.querySelector("#c");
+  const stats = new Stats();
+  document.body.appendChild(stats.domElement);
   const renderer = new THREE.WebGLRenderer({ canvas: canvas });
   // renderer.outputEncoding = THREE.sRGBEncoding;
   renderer.shadowMap.enabled = true;
 
   const scene = new THREE.Scene();
+  // scene.fog = new THREE.Fog(0xffffff, 0, 3000);
+  // scene.background = new THREE.Color(0xffffff)
 
   const fov = 45;
   const aspect = 2;
   const near = 0.1;
-  const far = 3000;
+  const far = 4000;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
   camera.rotation.order = "YXZ";
   camera.position.set(0, 70, 0);
@@ -24,7 +30,7 @@ function main() {
   const startX = camera.position.x,
     startZ = camera.position.z,
     visionR = far,
-    loadR = 4000;
+    loadR = 5000;
 
   const visionArea = new Rectangle(startX, startZ, visionR, visionR);
   const loadArea = new Rectangle(startX, startZ, loadR, loadR);
@@ -84,7 +90,7 @@ function main() {
   const textureLoader = new THREE.TextureLoader();
   const colorMap = textureManager(
     textureLoader,
-    "resources/images/terrain/terrain_base_standard.png"
+    "resources/images/terrain/terrain_base_standard.png",
   );
   // const normalMap = textureManager(
   //   textureLoader,
@@ -92,7 +98,7 @@ function main() {
   // );
   const displaceMap = textureManager(
     textureLoader,
-    "resources/images/terrain/terrain_displace_standard.png"
+    "resources/images/terrain/terrain_displace_standard.png",
   );
   const plain = new THREE.Mesh(
     plainGeometry,
@@ -100,7 +106,7 @@ function main() {
       map: colorMap,
       // normalMap: normalMap,
       displacementMap: displaceMap,
-    })
+    }),
   );
   plain.receiveShadow = true;
   // const pointsGeometry = plainGeometry.clone();
@@ -112,7 +118,7 @@ function main() {
   scene.add(plain);
 
   // tree object 格式说明
-  const names = ["法国梧桐", "桂花", "红枫", "国槐"];
+  const names = ["普通乔木", "桂花", "红枫", "国槐"];
   const customizeTree = new CustomizeTree();
   const builder = new TreeBuilder();
 
@@ -154,7 +160,7 @@ function main() {
     // singleTree is a THREE.Group
     singleTree.children.forEach((child) => {
       instancedMeshes.push(
-        new THREE.InstancedMesh(child.geometry, child.material, number)
+        new THREE.InstancedMesh(child.geometry, child.material, number),
       );
     });
     for (let i = 0; i < number; i++) {
@@ -162,7 +168,7 @@ function main() {
       trans.makeTranslation(
         Math.random() * planeSize - planeSize / 2,
         0,
-        Math.random() * planeSize - planeSize / 2
+        Math.random() * planeSize - planeSize / 2,
       );
       rot.makeRotationY(Math.random() * 2 * Math.PI);
       scl.makeScale(1, 1, 1);
@@ -200,8 +206,9 @@ function main() {
       const p = new THREE.Vector3(
         Math.random() * planeSize - planeSize / 2,
         0,
-        Math.random() * planeSize - planeSize / 2
+        Math.random() * planeSize - planeSize / 2,
       );
+      clone.scale.set(10, 10, 10);
       clone.position.set(p.x, p.y, p.z);
       quadTree.insert(new Point(p.x, p.z, 5, clone));
     }
@@ -218,18 +225,18 @@ function main() {
     rec.x = camera.position.x;
     rec.y = camera.position.z;
     quadTree.query(rec, shadowFound);
-    shadowFound.forEach((p) => {
-      if (!prevShadowFound.includes(p))
-        p.obj.children.forEach((child) => {
-          child.castShadow = true;
-        });
-    });
-    prevShadowFound.forEach((p) => {
-      if (!shadowFound.includes(p))
-        p.obj.children.forEach((child) => {
-          child.castShadow = false;
-        });
-    });
+    // shadowFound.forEach((p) => {
+    //   if (!prevShadowFound.includes(p))
+    //     p.obj.children.forEach((child) => {
+    //       child.castShadow = true;
+    //     });
+    // });
+    // prevShadowFound.forEach((p) => {
+    //   if (!shadowFound.includes(p))
+    //     p.obj.children.forEach((child) => {
+    //       child.castShadow = false;
+    //     });
+    // });
     prevShadowFound = shadowFound.slice();
     shadowFound = [];
   };
@@ -278,7 +285,7 @@ function main() {
     return playerDirection;
   }
 
-  let speedDelta = 5;
+  let speedDelta = 10;
   function movement() {
     if (keyStates["KeyW"])
       camera.position.add(getForwardVector().multiplyScalar(speedDelta));
@@ -341,6 +348,7 @@ function main() {
       camera.updateProjectionMatrix();
     }
     movement();
+    stats.update();
     renderer.render(scene, camera);
   }
 
