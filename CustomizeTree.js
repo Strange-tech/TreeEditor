@@ -56,7 +56,7 @@ class CustomizeTree {
           // middle node
           {
             sub_branches: [
-              [0.6, 0.2, Math.PI / 3, Math.PI / 36, 4, 0.5, 6],
+              [0.6, 0.2, Math.PI / 4, Math.PI / 36, 4, 0.5, 5],
               [0.9, 0, 0, 0, 3, 0.5, 1],
             ],
           },
