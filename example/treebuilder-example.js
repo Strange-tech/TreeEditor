@@ -58,10 +58,10 @@ async function main() {
     lightDirection: new THREE.Vector3(
       params.lightX,
       params.lightY,
-      params.lightZ
+      params.lightZ,
     ).normalize(),
     lightColor: new THREE.Color(0x000020),
-    lightIntensity: 0.2,
+    lightIntensity: 0.5,
     camera: camera,
   });
 
@@ -88,7 +88,11 @@ async function main() {
     // singleTree is a THREE.Group
     singleTree.children.forEach((child) => {
       instancedMeshes.push(
-        new THREE.InstancedMesh(child.geometry, child.material, matrices.length)
+        new THREE.InstancedMesh(
+          child.geometry,
+          child.material,
+          matrices.length,
+        ),
       );
     });
     matrices.forEach((matrix, index) => {

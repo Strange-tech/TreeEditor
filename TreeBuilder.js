@@ -23,7 +23,7 @@ class TreeBuilder {
     treeObj,
     mergeLeaves = true,
     scene = null,
-    verticalAxis = "y-axis"
+    verticalAxis = "y-axis",
   ) {
     this.scene = scene;
     this.treeObj = treeObj;
@@ -117,7 +117,7 @@ class TreeBuilder {
     position_noise,
     base_angle,
     angle_noise,
-    number
+    number,
   ) {
     const matrices = [];
     let pointsLength = points.length;
@@ -125,21 +125,21 @@ class TreeBuilder {
     for (let i = 1; i <= number; i++) {
       let base = Math.floor(
         pointsLength *
-          (base_position + randomRangeLinear(-position_noise, position_noise))
+          (base_position + randomRangeLinear(-position_noise, position_noise)),
       );
       let position = points[base];
       let tangent = curve.getTangent(base / pointsLength);
       let orthogonal = new THREE.Vector3(
         0,
         1,
-        -tangent.y / tangent.z
+        -tangent.y / tangent.z,
       ).normalize();
       if (i === 1) {
         dir = new THREE.Vector3()
           .copy(tangent)
           .applyAxisAngle(
             orthogonal,
-            base_angle + randomRangeLinear(-angle_noise, angle_noise)
+            base_angle + randomRangeLinear(-angle_noise, angle_noise),
           )
           .applyAxisAngle(tangent, (Math.random() * Math.PI) / 2)
           .normalize();
@@ -154,11 +154,11 @@ class TreeBuilder {
       let trans = new THREE.Matrix4().makeTranslation(
         position.x,
         position.y,
-        position.z
+        position.z,
       );
       let rot1 = new THREE.Matrix4().makeRotationAxis(
           this.verticalAxis,
-          Math.random() * 2 * Math.PI
+          Math.random() * 2 * Math.PI,
         ), // (0,2pi)
         rot2 = new THREE.Matrix4().makeRotationAxis(rot_axis, rot_angle);
       let rot = new THREE.Matrix4().multiply(rot2).multiply(rot1);
@@ -178,7 +178,7 @@ class TreeBuilder {
       makeVector3(start),
       makeVector3(end),
       disturb,
-      gravity
+      gravity,
     );
     const curSkeleton = new TreeSkeleton(nodes);
     fatherSkeleton.add(curSkeleton);
@@ -197,7 +197,7 @@ class TreeBuilder {
         let base = Math.floor(
           pointsLength *
             (sub_branches[i][0] +
-              randomRangeLinear(-sub_branches[i][1], sub_branches[i][1]))
+              randomRangeLinear(-sub_branches[i][1], sub_branches[i][1])),
         );
         let s = points[base];
         if (j === 1) {
@@ -205,14 +205,14 @@ class TreeBuilder {
           let orthogonal = new THREE.Vector3(
             0,
             -tangent.z / tangent.y,
-            1
+            1,
           ).normalize();
           dir = new THREE.Vector3()
             .copy(tangent)
             .applyAxisAngle(
               orthogonal,
               sub_branches[i][2] +
-                randomRangeLinear(-sub_branches[i][3], sub_branches[i][3])
+                randomRangeLinear(-sub_branches[i][3], sub_branches[i][3]),
             )
             .applyAxisAngle(tangent, (Math.random() * Math.PI) / 2)
             .normalize();
@@ -225,8 +225,8 @@ class TreeBuilder {
           s,
           dir.multiplyScalar(
             sub_branches[i][4] +
-              randomRangeLinear(-sub_branches[i][5], sub_branches[i][5])
-          )
+              randomRangeLinear(-sub_branches[i][5], sub_branches[i][5]),
+          ),
         );
         this.buildSkeletonRec(s, e, curSkeleton, depth + 1);
       }
@@ -257,7 +257,7 @@ class TreeBuilder {
           leaves[i][1],
           leaves[i][2],
           leaves[i][3],
-          leaves[i][4]
+          leaves[i][4],
         );
         // flower
         if (flowers) {
@@ -268,7 +268,7 @@ class TreeBuilder {
             flowers[i][1],
             flowers[i][2],
             flowers[i][3],
-            flowers[i][4]
+            flowers[i][4],
           );
         }
         if (this.mergeLeaves) {
@@ -288,7 +288,7 @@ class TreeBuilder {
       radial_segments,
       false,
       ((1 - this.treeObj.shrink.single) * radius) / tubular_segments,
-      curveLength * sample_offset
+      curveLength * sample_offset,
     );
     this.branchGeometries.push(branchGeometry);
     skeleton.children.forEach((child) => {
@@ -301,7 +301,7 @@ class TreeBuilder {
     fatherSkeleton,
     baseZ = 0,
     startArray = [],
-    depth = 0
+    depth = 0,
   ) {
     let totalDepth = this.treeObj.depth;
     if (depth > totalDepth - 1) return;
@@ -315,7 +315,7 @@ class TreeBuilder {
     let { centroids, clusters } = kMeans(
       data,
       depth > 0 ? total_branch_num : 1,
-      this.scene
+      this.scene,
     );
     console.log(total_branch_num, centroids.length / 3);
     let l = centroids.length;
@@ -342,7 +342,7 @@ class TreeBuilder {
         startVector,
         endVector,
         disturb,
-        gravity
+        gravity,
       );
       let curSkeleton = new TreeSkeleton(treeNodes);
       fatherSkeleton.add(curSkeleton);
@@ -359,7 +359,7 @@ class TreeBuilder {
         for (let j = 0; j < next_total_branch_num; j++) {
           let base = Math.floor(
             pointsLength *
-              (fork[i][0] + randomRangeLinear(-fork[i][1], fork[i][1]))
+              (fork[i][0] + randomRangeLinear(-fork[i][1], fork[i][1])),
           );
           nextStartArray.push(points[base]);
         }
@@ -370,7 +370,7 @@ class TreeBuilder {
         curSkeleton,
         baseZ,
         nextStartArray,
-        depth + 1
+        depth + 1,
       );
     }
   }
@@ -461,11 +461,11 @@ class TreeBuilder {
             g.height,
             g.width_foldDegree,
             g.height_foldDegree,
-            verticalAxis
+            verticalAxis,
           )
             .generate()
             .scale(treeObj.leaf.scale, treeObj.leaf.scale, treeObj.leaf.scale)
-            .applyMatrix4(matrix)
+            .applyMatrix4(matrix),
         );
       });
       const mergedLeavesGeometry = mergeGeometries(leafGeometries, false);
@@ -481,10 +481,10 @@ class TreeBuilder {
               .scale(
                 treeObj.flower.scale,
                 treeObj.flower.scale,
-                treeObj.flower.scale
+                treeObj.flower.scale,
               )
               .translate(0, 0.12, 0)
-              .applyMatrix4(matrix)
+              .applyMatrix4(matrix),
           );
         });
         const mergedFlowersGeometry = mergeGeometries(flowerGeometries, false);
