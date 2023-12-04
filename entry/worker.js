@@ -3,13 +3,14 @@ import { TreeBuilder } from "../TreeBuilder";
 import { CustomizeTree } from "../CustomizeTree";
 
 const customizeTrees = new CustomizeTree();
-const treeObj = customizeTrees.getTree("法国梧桐");
-const builder = new TreeBuilder(treeObj, true, "z-axis");
+const treeObj = customizeTrees.getTree("普通乔木");
+const builder = new TreeBuilder(treeObj, true);
 
 self.addEventListener(
   "message",
   (event) => {
     const clusters = event.data.input;
+    // console.log(clusters);
     const skeletons = [];
     console.time("kmeans skeleton timer");
     clusters.forEach((cluster) => {
@@ -19,7 +20,7 @@ self.addEventListener(
 
     self.postMessage(skeletons);
 
-    // console.log("finish computing!");
+    console.log("finish computing!");
   },
-  false
+  false,
 );

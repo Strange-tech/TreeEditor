@@ -18,8 +18,8 @@ class CustomizeTree {
       ["垂丝海棠", 7],
       ["丁香", 8],
       ["凤凰木", 9],
-      // ["水杉", 10],
-      // ["落叶松", 11],
+      ["水杉", 10],
+      ["落叶松", 11],
       // ["海棠", 10],
       // ["红果冬青", 11],
     ]);
@@ -47,10 +47,10 @@ class CustomizeTree {
             radius: 0.6,
             sub_branches: [
               // [ sub_branches_position, noise1, sub_branches_angle, noise2, next_level_length, noise3, number ]
-              [0.4, 0.1, Math.PI / 2.5, Math.PI / 36, 7, 0.5, 6],
-              [0.6, 0.05, Math.PI / 3, 0, 6, 0.5, 3],
-              [0.8, 0.05, Math.PI / 3, 0, 5, 0.5, 3],
-              [0.95, 0, 0, 0, 4, 0.5, 1],
+              [0.4, 0.1, Math.PI / 2.5, Math.PI / 36, 7, 0.5, 3],
+              // [0.6, 0.05, Math.PI / 3, 0, 6, 0.5, 3],
+              // [0.8, 0.05, Math.PI / 3, 0, 5, 0.5, 3],
+              // [0.95, 0, 0, 0, 4, 0.5, 1],
             ],
           },
           // middle node
