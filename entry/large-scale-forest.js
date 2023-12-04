@@ -24,7 +24,7 @@ function main() {
   const canvas = document.querySelector("#c");
   const stats = new Stats();
   document.body.appendChild(stats.domElement);
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({ canvas });
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -197,7 +197,7 @@ function main() {
   // TERRAIN
   terrain.loadTexture(
     "resources/images/terrain/terrain_base.png",
-    "resources/images/terrain/terrain_normal.png"
+    "resources/images/terrain/terrain_normal.png",
   );
   csm.setupMaterial(terrain.planeMaterial);
   const terrainMesh = terrain.getMesh();
@@ -233,20 +233,18 @@ function main() {
     return needResize;
   }
 
-
   function render() {
-
     // 图像不随屏幕拉伸改变
     if (resizeRendererToDisplaySize(renderer)) {
       const canvas = renderer.domElement;
       camera.aspect = canvas.clientWidth / canvas.clientHeight;
       camera.updateProjectionMatrix();
     }
-    if (cnt < points.length) camera.position.copy(points[cnt++]);
+    // if (cnt < points.length) camera.position.copy(points[cnt++]);
     controls.update();
-      instancedLODs.forEach((instance) => {
-        instance.render();
-      });
+    instancedLODs.forEach((instance) => {
+      instance.render();
+    });
     csm.update();
     stats.update();
     renderer.render(scene, camera);
