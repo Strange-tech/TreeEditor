@@ -304,38 +304,33 @@ class TreeBuilder {
     depth = 0,
   ) {
     let totalDepth = this.treeObj.depth;
-    if (depth > totalDepth - 1) return;
+    if (depth > totalDepth) return;
 
     const cur_node = this.treeObj.branches[depth];
-    const next_node = this.treeObj.branches[depth + 1];
-    let total_branch_num = 0;
-    cur_node.fork.forEach((f) => {
-      total_branch_num += f.at(-1);
-    });
+    let total_branch_num = startArray.length;
     let { centroids, clusters } = kMeans(
       data,
       depth > 0 ? total_branch_num : 1,
       this.scene,
     );
-    console.log(total_branch_num, centroids.length / 3);
+    // console.log(total_branch_num, centroids.length / 3);
     let l = centroids.length;
     let startVector, centroidVector, endVector;
     let disturb = depth === 0 ? 0 : this.treeObj.disturb;
     let gravity = depth === 0 ? 0 : this.treeObj.gravity;
-    const fork = cur_node.fork;
 
     for (let i = 0; i < l; i += 3) {
       let nextStartArray = [];
       centroidVector = new THREE.Vector3().fromArray(centroids, i);
       startVector =
-        startArray.length > 0
+        total_branch_num > 0
           ? startArray[i / 3]
           : new THREE.Vector3(centroidVector.x, centroidVector.y, baseZ);
       endVector = new THREE.Vector3()
         .addVectors(startVector, centroidVector)
         .divideScalar(2);
-      if (depth === totalDepth)
-        endVector.setX(centroidVector.x).setY(centroidVector.y);
+      // if (depth === totalDepth)
+      //   endVector.setX(centroidVector.x).setY(centroidVector.y);
 
       // 存储骨架
       let treeNodes = disturbedCurveNode(
@@ -348,21 +343,20 @@ class TreeBuilder {
       fatherSkeleton.add(curSkeleton);
 
       // 生成下次递归的开始节点
-      if (depth + 1 < totalDepth) {
+      if (depth < totalDepth) {
         let curve = new THREE.CatmullRomCurve3(treeNodes);
         let points = curve.getPoints(50);
         let pointsLength = points.length;
-        let next_total_branch_num = 0;
-        next_node.fork.forEach((f) => {
-          next_total_branch_num += f.at(-1);
+        cur_node.sub_branches.forEach((sub_branch) => {
+          for (let _ = 0; _ < sub_branch.at(-1); _++) {
+            let base = Math.floor(
+              pointsLength *
+                (sub_branch[0] +
+                  randomRangeLinear(-sub_branch[1], sub_branch[1])),
+            );
+            nextStartArray.push(points[base]);
+          }
         });
-        for (let j = 0; j < next_total_branch_num; j++) {
-          let base = Math.floor(
-            pointsLength *
-              (fork[i][0] + randomRangeLinear(-fork[i][1], fork[i][1])),
-          );
-          nextStartArray.push(points[base]);
-        }
       }
 
       this.buildKmeansSkeletonRec(

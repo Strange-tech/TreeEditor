@@ -14,8 +14,8 @@ const disturbedCurveNode = (start, end, disturb, gravity) => {
     new THREE.Vector3(
       Math.random() * 2 * l - l,
       Math.random() * 2 * l - l,
-      Math.random() * 2 * l - l
-    )
+      Math.random() * 2 * l - l,
+    ),
   );
   if (gravity) end.y -= g;
 
@@ -40,10 +40,11 @@ const drawLine = (skeleton, fatherLine, pointGroup) => {
   const vectors = makeVectors(skeleton.positions);
   const curve = new THREE.CatmullRomCurve3(vectors);
   const points = curve.getPoints(10);
-  points.forEach((p) => {
-    let toSeeP = toSeePoint(p);
-    pointGroup.add(toSeeP);
-  });
+  if (pointGroup)
+    points.forEach((p) => {
+      let toSeeP = toSeePoint(p);
+      pointGroup.add(toSeeP);
+    });
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
   const material = new THREE.LineBasicMaterial({
     color: "red",
@@ -58,7 +59,7 @@ const drawLine = (skeleton, fatherLine, pointGroup) => {
 const toSeePoint = (position, color) => {
   const mesh = new THREE.Mesh(
     new THREE.SphereGeometry(2),
-    new THREE.MeshBasicMaterial({ color: color })
+    new THREE.MeshBasicMaterial({ color: color }),
   );
   mesh.position.copy(position);
   return mesh;

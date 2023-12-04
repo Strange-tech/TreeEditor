@@ -40,7 +40,7 @@ async function main() {
     new THREE.MeshLambertMaterial({
       wireframe: true,
       color: "black",
-    })
+    }),
   );
 
   // scene.add(plain);
@@ -53,7 +53,11 @@ async function main() {
     // singleTree is a THREE.Group
     singleTree.children.forEach((child) => {
       instancedMeshes.push(
-        new THREE.InstancedMesh(child.geometry, child.material, matrices.length)
+        new THREE.InstancedMesh(
+          child.geometry,
+          child.material,
+          matrices.length,
+        ),
       );
     });
     matrices.forEach((matrix, index) => {
@@ -71,7 +75,7 @@ async function main() {
   console.timeEnd("request");
 
   const customizeTree = new CustomizeTree();
-  const treeObj = customizeTree.getTree("香樟");
+  const treeObj = customizeTree.getTree("普通乔木");
 
   // 6) 客户端对骨架进行离线渲染
   let singleTree;

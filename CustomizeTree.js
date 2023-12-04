@@ -19,7 +19,7 @@ class CustomizeTree {
       ["丁香", 8],
       ["凤凰木", 9],
       ["水杉", 10],
-      // ["落叶松", 11],
+      ["落叶松", 11],
       // ["海棠", 10],
       // ["红果冬青", 11],
     ]);
@@ -31,8 +31,8 @@ class CustomizeTree {
         disturb: 0.08,
         gravity: 0,
         shrink: { single: 0.4, multi: 0.4, root: true },
-        tubular_segments: 10,
-        radial_segments: 6,
+        tubular_segments: 5,
+        radial_segments: 4,
         sample_offset: 0.005,
         leaf: {
           geometry: { style: "cross", width: 0.7, height: 1 },
@@ -47,16 +47,16 @@ class CustomizeTree {
             radius: 0.6,
             sub_branches: [
               // [ sub_branches_position, noise1, sub_branches_angle, noise2, next_level_length, noise3, number ]
-              [0.4, 0.1, Math.PI / 2.5, Math.PI / 36, 7, 0.5, 6],
-              [0.6, 0.05, Math.PI / 3, 0, 6, 0.5, 3],
-              [0.8, 0.05, Math.PI / 3, 0, 5, 0.5, 3],
-              [0.95, 0, 0, 0, 4, 0.5, 1],
+              [0.4, 0.1, Math.PI / 2.5, Math.PI / 36, 7, 0.5, 3],
+              // [0.6, 0.05, Math.PI / 3, 0, 6, 0.5, 3],
+              // [0.8, 0.05, Math.PI / 3, 0, 5, 0.5, 3],
+              // [0.95, 0, 0, 0, 4, 0.5, 1],
             ],
           },
           // middle node
           {
             sub_branches: [
-              [0.6, 0.2, Math.PI / 3, Math.PI / 36, 4, 0.5, 6],
+              [0.6, 0.2, Math.PI / 4, Math.PI / 36, 4, 0.5, 5],
               [0.9, 0, 0, 0, 3, 0.5, 1],
             ],
           },
@@ -78,7 +78,7 @@ class CustomizeTree {
         gravity: 0,
         shrink: { single: 0.4, multi: 0.5, root: true },
         tubular_segments: 5,
-        radial_segments: 6,
+        radial_segments: 4,
         sample_offset: 0.01,
         leaf: {
           geometry: { style: "cross", width: 1, height: 1 },
@@ -117,7 +117,7 @@ class CustomizeTree {
         gravity: 0.07,
         shrink: { single: 0.4, multi: 0.45, root: true },
         tubular_segments: 5,
-        radial_segments: 6,
+        radial_segments: 4,
         sample_offset: 0.01,
         leaf: {
           geometry: { style: "cross", width: 0.5, height: 1, foldDegree: 0.3 },
@@ -168,7 +168,7 @@ class CustomizeTree {
         disturb: 0.03,
         gravity: 0.1,
         shrink: { single: 0.2, multi: 0.45, root: false },
-        tubular_segments: 10,
+        tubular_segments: 5,
         radial_segments: 4,
         sample_offset: 0,
         leaf: {
@@ -211,7 +211,7 @@ class CustomizeTree {
         disturb: 0.05,
         gravity: -0.1,
         shrink: { single: 0.2, multi: 0.3, root: false },
-        tubular_segments: 10,
+        tubular_segments: 5,
         radial_segments: 4,
         sample_offset: 0.005,
         leaf: {
@@ -264,7 +264,7 @@ class CustomizeTree {
         disturb: 0.02,
         gravity: -0.2,
         shrink: { single: 0.2, multi: 0.35, root: true },
-        tubular_segments: 10,
+        tubular_segments: 5,
         radial_segments: 4,
         sample_offset: 0.005,
         leaf: {
@@ -312,7 +312,7 @@ class CustomizeTree {
         disturb: 0.02,
         gravity: -0.2,
         shrink: { single: 0.2, multi: 0.3, root: false },
-        tubular_segments: 10,
+        tubular_segments: 5,
         radial_segments: 4,
         sample_offset: 0.005,
         leaf: {
@@ -365,7 +365,7 @@ class CustomizeTree {
         disturb: 0.05,
         gravity: -0.3,
         shrink: { single: 0.2, multi: 0.3, root: false },
-        tubular_segments: 10,
+        tubular_segments: 5,
         radial_segments: 4,
         sample_offset: 0.005,
         leaf: {
@@ -418,8 +418,8 @@ class CustomizeTree {
         disturb: 0.03,
         gravity: 0.1,
         shrink: { single: 0.2, multi: 0.45, root: false },
-        tubular_segments: 10,
-        radial_segments: 6,
+        tubular_segments: 5,
+        radial_segments: 4,
         sample_offset: 0.007,
         leaf: {
           geometry: { style: "folded", width: 0.5, height: 1 },
@@ -465,8 +465,8 @@ class CustomizeTree {
         disturb: 0.05,
         gravity: -0.1,
         shrink: { single: 0.2, multi: 0.35, root: true },
-        tubular_segments: 10,
-        radial_segments: 6,
+        tubular_segments: 5,
+        radial_segments: 4,
         sample_offset: 0.005,
         leaf: {
           geometry: { style: "folded_reverse", width: 1, height: 1 },
