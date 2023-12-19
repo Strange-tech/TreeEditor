@@ -168,6 +168,12 @@ class TreeBuilder {
   //   return matrices;
   // }
 
+  leafPosition(points) {
+    let position = points.at(-1);
+    // console.log(position);
+    return position;
+  }
+
   buildSkeletonRec(start, end, fatherSkeleton, depth = 0) {
     if (depth > this.treeObj.depth) return;
 
@@ -247,18 +253,19 @@ class TreeBuilder {
       // 叶子节点
       const leaves = this.treeObj.branches.at(-1).leaves;
       const flowers = this.treeObj.branches.at(-1).flowers;
-      let matrices1, matrices2;
+      let leafpositions, matrices2;
       for (let i = 0; i < leaves.length; i++) {
         // leaf
-        matrices1 = this.randomMatrices(
-          curve,
-          points,
-          leaves[i][0],
-          leaves[i][1],
-          leaves[i][2],
-          leaves[i][3],
-          leaves[i][4],
-        );
+        // matrices1 = this.randomMatrices(
+        //   curve,
+        //   points,
+        //   leaves[i][0],
+        //   leaves[i][1],
+        //   leaves[i][2],
+        //   leaves[i][3],
+        //   leaves[i][4],
+        // );
+        leafpositions = this.leafPosition(points);
         // flower
         if (flowers) {
           matrices2 = this.randomMatrices(
@@ -272,11 +279,11 @@ class TreeBuilder {
           );
         }
         if (this.mergeLeaves) {
-          this.leaf_matrices.push(...matrices1);
+          this.leaf_matrices.push(leafpositions);
           if (this.treeObj.flower && flowers)
             this.flower_matrices.push(...matrices2);
           if (this.treeObj.flower && !flowers)
-            this.flower_matrices.push(...matrices1);
+            this.flower_matrices.push(...leafpositions);
         }
       }
     }
@@ -446,25 +453,51 @@ class TreeBuilder {
 
     // 3. 合并方式做树叶，递归函数后创建mesh
     if (mergeLeaves) {
-      const leafGeometries = [];
-      leaf_matrices.forEach((matrix) => {
-        leafGeometries.push(
-          new LeafGeometry(
-            g.style,
-            g.width,
-            g.height,
-            g.width_foldDegree,
-            g.height_foldDegree,
-            verticalAxis,
-          )
-            .generate()
-            .scale(treeObj.leaf.scale, treeObj.leaf.scale, treeObj.leaf.scale)
-            .applyMatrix4(matrix),
-        );
+      // const leafGeometries = [];
+      // leaf_matrices.forEach((matrix) => {
+      //   leafGeometries.push(
+      //     new LeafGeometry(
+      //       g.style,
+      //       g.width,
+      //       g.height,
+      //       g.width_foldDegree,
+      //       g.height_foldDegree,
+      //       verticalAxis,
+      //     )
+      //       .generate()
+      //       .scale(treeObj.leaf.scale, treeObj.leaf.scale, treeObj.leaf.scale)
+      //       .applyMatrix4(matrix),
+      //   );
+      // });
+      // const mergedLeavesGeometry = mergeGeometries(leafGeometries, false);
+      // this.leaf = new THREE.Mesh(mergedLeavesGeometry, leafMaterial);
+      // tree.add(this.leaf);
+      const vertices = [];
+      leaf_matrices.forEach((position) => {
+        // console.log(position);
+        for (let i = 0; i < 200; i++) {
+          const x = position.x + (2 * Math.random() - 1) * 2;
+          const y = position.y + (2 * Math.random() - 1) * 2;
+          const z = position.z + (2 * Math.random() - 1) * 2;
+          vertices.push(x, y, z);
+        }
       });
-      const mergedLeavesGeometry = mergeGeometries(leafGeometries, false);
-      this.leaf = new THREE.Mesh(mergedLeavesGeometry, leafMaterial);
-      tree.add(this.leaf);
+      // console.log(vertices);
+
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute(
+        "position",
+        new THREE.Float32BufferAttribute(vertices, 3),
+      );
+      const material = new THREE.PointsMaterial({
+        color: 0x009900,
+        size: 0.5,
+        sizeAttenuation: true,
+        map: leafTexture,
+        alphaTest: 0.5,
+      });
+      const points = new THREE.Points(geometry, material);
+      tree.add(points);
 
       if (treeObj.flower) {
         const flowerGeometries = [];
